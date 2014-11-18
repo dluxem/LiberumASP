@@ -1,0 +1,107 @@
+
+body {
+  font-family: Verdana, Arial, Helvetica;
+  font-size: 10pt;
+  color: #000000;
+  background-color: #FFFFFF;
+}
+
+a.HeadLink {
+  text-decoration: none;
+  color: #FFFFFF;
+}
+
+
+a.HeadLink:hover {
+  text-decoration: underline;
+  color: #FFFFFF;
+}
+
+a {
+  text-decoration: none;
+  color: #0099FF;
+}
+
+a:hover {
+  color: #00FF00;
+}
+
+HeadLink {
+  text-decoration: none;
+  color: #FFFFFF;
+}
+
+table.Narrow {
+  font-size: 10pt;
+  width: 300px;
+}
+
+table.Normal {
+  font-size: 10pt;
+  width: 500px;
+}
+
+table.Wide {
+  font-size: 10pt;
+  width: 620px
+}
+
+table.Inout {
+  font-size: 10pt;
+  width: 500px;
+  border-collapse: collapse;
+}
+
+table.InoutWide {
+  font-size: 10pt;
+  width: 620px;
+  border-collapse: collapse;
+}
+
+tr.Head1 { 
+  font-size: 15pt;
+  color: #FFFFFF;
+  font-weight: bold;
+  text-align: center;
+  background-color: #0099FF;
+}
+
+tr.Head2 {
+  color: #FFFFFF;
+  font-weight: bold;
+  background-color: #0099FF;
+}
+
+tr.Body1 { 
+  color: #000000;
+  background-color: #EEEEEE;
+}
+
+tr.Body1c { 
+  color: #000000;
+  text-align: center;
+  background-color: #EEEEEE;
+}
+tr.Body2 { 
+  color: #000000;
+  background-color: #CCCCCC;
+}
+
+tr.Body3 { 
+  color: #000000;
+  background-color: #FFFFFF;
+}
+
+tr.Body3c { 
+  color: #000000;
+  text-align: center;
+  background-color: #FFFFFF;
+}
+
+em {
+  color: #FF0000;
+}
+
+.info {
+  font-family: Webdings, Verdana, Arial, Helvetica;
+}

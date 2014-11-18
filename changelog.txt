@@ -1,0 +1,177 @@
+	LIBERUM HELP DESK
+	-----------------
+
+Change Log:
+v0.97.3 (08/28/2002)
+New:
+* Added French language file
+* Added Spanish language file
+Fixed:
+* Deleting reps with categories assigned
+* Formatting problem in rep/details.asp
+* Department required error in rep/new.asp
+* Replace with null error in rep/new.asp
+
+
+v0.97.2 (06/15/2002)
+New:
+* Added German language file
+Fixed:
+* Date display problems
+
+
+v0.97.1 (01/29/2001)
+New:
+* Added trouble shooting pages to admin section
+Fixed:
+* Session timeouts in setup.asp
+* Blank pages with NT authentication
+* Fixed missing KB optio in rep/new.asp
+* Added error message when lang strings are missing
+* Added missing strings to Dutch translation
+
+
+v0.97 (01/19/2002)
+New:
+* Added In/Out Board - se readme_inout.txt for more info. (Morten)
+* Added multi-language support.
+* Improved knowledge base searching.
+* Problems can be selected for inclusion in the KB.
+* Improved problem searching.
+* Added SQL full-text query support.
+* Added ASPMail support.
+* Added the ability to reopen problems.
+* Additional notes are kept seperate from the problem desciption now.
+* Notes can be marked as private, and made inaccessable to the user.
+* Improved user management for the administrator.
+* Improved page layouts.
+* Using style sheets for colors and formatting.
+* Added Use Select User on the helpdesk config page.
+  This enables/disables the use of a combobox to select
+  users on rep/new.asp form (Morten)
+
+  
+v0.96  (09/17/01)
+New:
+* Fixed bug with apostrophes in problem descripts
+* Fixed bug with deleting reps with assigned categories
+* Fixed bug with non US date format systems
+* Fixed bug when adding reps or editing users in the admin
+  pages.
+* Added setup.asp for updated the database to the
+  current version.
+* Added programming style guidelines.
+* Added user notification emails for problem updates.
+
+
+v0.95a	(04/26/01)
+New:
+* Fixed error in admin/delete.asp, line 56.
+* Changed URL to license.html in the page footers
+* Fixed error when sending mail to usernames that
+  do not exist in the database.
+  
+
+v0.95	(04/23/01)
+New:
+* Most everything has changed!!
+* Impoved authentication and user management
+* Removed global.asa, configuration is now done in
+  settings.asp and by web-based forms
+* Added a user knowledge base
+* Fixed overflow error in admin reports
+* Printer friendly pages for problem details
+* Added error handling
+* Added support for remote SMTP servers by using
+  JMail and ASPEmail
+* Impoved handling of ADO connections
+* Lengthened session timeouts on problem entry pages
+* Added support for pagers
+Issues:
+* A lot of new stuff, so there might be some new 
+  problems too
+
+
+v0.94   (12/14/00)
+New:
+* logout.asp to end a session
+* editinfo.asp which allows users to change passwords
+  or email address
+* admin/viewusers.asp, modifyuser.asp, confdeluser.asp,
+  deleteuser.asp - allows admins to modify and delete
+  user accounts
+* Changed database connections strings to use OLE DB
+  providers instead of older style ODBC drivers
+* Resolved access denied issues when going directly
+  to a page without logging in (i.e. from an email URL)
+* Added better input checking on all forms
+* Fixed a few broken links on the admin pages
+* Fixed column properties in user table of Access database
+Issues:
+* Because of the swithc to OLE DB, you may need to
+  update your MS Data Access Components (MDAC).  Download
+  them at http://www.microsoft.com/data/download.htm
+
+
+v0.93	(09/28/00)
+New:
+* NT authentication is no longer required - users
+  can create their own accounts (stored in the db)
+* Added table 'users' to the database
+* Added pages forgotpass.asp, register.asp
+* Modified global.asa, default.asp
+Issues:
+* There may be bugs in this new type of authentication
+  so try it out.
+* There will be more administrative features to add/del
+  users in the next release.
+
+
+v0.92b	(09/02/00)
+New:
+* updated readme.txt with instructions for
+  using the access database.
+
+
+v0.92a	(08/30/00)
+New:
+* admin/postmods.asp - fix problem with posting
+  a support rep's description
+Issues:
+* There might be a problem under some configurations
+  with mutliple users accessing the MDB file.  Let
+  me know if you see this happening: support@liberum.org
+
+
+v0.92	(08/28/00)
+New:
+* Almost all files have been changed, including
+  the database table names
+* Now support a MS Access .MDB file a long with
+  using SQL.
+* Restricting access by NTFS permissions is no
+  longer required.
+* The main start page automatically displays the
+  correct menu depending on the type of user.
+* Admin pages now password restricted.
+* Cleaned up and commented code
+
+
+v0.91	(07/03/00)
+New:
+* global.asa - added support for NT Auth for SQL
+* helpdesk.sql - fixed problem with keys INSERT
+* rep/view.asp - fixed problem with wrong rep being
+  displayed
+
+
+v0.9	(06/25/00)
+New:
+* First public version
+* All files are new
+
+Issues:
+* Integrated SQL security hasn't been tested
+* Documentation needs to be written/updated
+* ASP files need to be commented
+	

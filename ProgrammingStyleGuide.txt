@@ -1,0 +1,212 @@
+Liberum Help Desk, Copyright (C) 2000-2001 Doug Luxem
+Liberum Help Desk comes with ABSOLUTELY NO WARRANTY
+Please view the license.html file for the full GNU General Public License.
+
+Filename: ProgrammingStyleGuide.txt
+Date:     $Date: 2001/10/13 19:03:38 $
+Version:  $Revision: 1.5 $
+Purpose:  This document explains the style guide to be used for all code in
+          the Liberum Help Desk project.  All developers contributing code
+          should follow this guide.
+
+
+SECTION I: GENERAL
+
+1. FILE NAMES
+
+- Files should all have a three letter extension as a guide to their contents.
+
+- An exception would be HTML files for which the extension ".html" should be
+used.
+
+2. LINE LENGTHS
+
+2.1. TEXT DOCUMENTATION FILES
+
+- Plain text documentation files, eg this file, should be no wider than 80
+chars so as to be viewable on a generic TTY interface.
+
+2.2. ASP FILES
+
+- ASP documents should be no wider than 110 characters wide, to allow for extra
+long lines (SQL statements, etc), except where wrapping a line might cause
+syntax errors or major readability issues.
+
+2.3. HTML FILES
+
+- HTML documents should be no wider than 110 characters wide, to allow for
+extra long lines (SQL statements, etc), except where wrapping a line might
+cause syntax errors or major readability issues.
+
+3. INDENTATION
+
+- All indentation should use two spaces.
+
+- No hard tabs are to be used.
+
+3.1. ASP & HTML FILES
+
+- Programming lines should have two extra indent in addition to that of the
+previous line.  This will differentiate wrapped lines with regular indentation.
+
+4. FILE HEADERS
+
+- The header of each file should contain the following comments (see the top
+of this file for an example):
+  1. The standard copyright header as shown at the top of this line.
+  2. The filename.
+  3. Last edit date - use the CVS Date variable.
+  4. The file version - use the CVS revision variable.
+  5. The file's purpose.
+
+- In ASP files this should be an ASP comment rather than an HTML comment to
+save end-user download time.
+
+5. MISCELLANOUS
+
+- Do not use the CVS Log keyword unless it would really be useful.  It makes
+for some really long files!
+
+
+Section II: ASP
+
+1. LANGUAGE
+
+- All code should be written in VBScript.
+
+2. COMMENTS
+
+- All comments should use the standard Visual Basic / VBScript style within the
+code itself, except for debugging purposes in which case use the standard HTML
+comments.
+
+- All comments should be before the line(s) they are relevent to, eg:
+
+' See if user is authenticated
+Call CheckUser(adoCon, sid)
+
+- Comment should be at the same indent level as the code they refer to.
+
+3. EMBEDDED HTML
+
+- Use two double-quotes to display double-quotes in the output code.
+
+
+Section III: HTML
+
+1. LANGUAGE
+
+- All HTML pages generated should conform to the official W3C XHTML 1.0
+Transitional specification.
+
+- All HTML pages generated should have the following three lines on the top of
+each page:
+
+<?xml version="1.0"?>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+1.1. XHTML 1.0 COMPLIANCE GUIDELINES
+
+- Use http://validator.w3c.org/ to validate output.
+
+- All tags, attributes names and attribute values must be in lower case.
+
+- All tags must have a closing tag or a " /" (a space and a forward slash)
+placeholder, e.g.: <p>This is a paragraph.</p>, <img src="pic.gif" />, <hr />.
+
+- All attribute values must be surrounded by double-quotation marks.
+
+- All single-word attributes must be altered to a name-value pair, e.g.
+<td nowrap></td> becomes <td nowrap="nowrap"></td>
+
+- No font tags anywhere.  Use the <div> or <span> tags with the relevant CSS
+code instead.
+
+- No center tags.  Use <div align="center"></div> instead, or create a CSS
+class.
+
+2. ACCESSABILITY
+
+- Generated pages should not have any level 1 errors on CAST Bobby.
+
+- Generated pages should not have any glaring level 2 errors on CAST
+Bobby.
+
+- Level 3 errors and all warnings are optional, but some of them might be worth
+following.
+
+2.1. COMPLIANCE GUIDELINES
+
+- Include a summary attribute on tables, eg <table summary="blah">.  This
+should explain the content of the table, even if the table is just used for
+layout purposes.
+
+- Include an apt description on all images.
+
+- Do not use color to describe content.
+
+- Do not use high-ASCII.
+
+- Do not use non-alphanumberic characters for purposes for which they are not
+designed.
+
+3. MISCELLANEOUS
+
+- There should be no space between the <a> tag and the first character of the
+next word after it; likewise there should be no space between the </a> tag and
+the last word before it.
+
+
+SECTION IV: VARIABLE NAMING CONVENTIONS
+
+1. GENERAL
+
+- All variables should use descriptive names.
+
+- Variables need to have a 2-4 letter prefix in lowercase that describes the
+data type used.
+
+- Variables should be lower case, except for capitalizing the start of each
+word.  An example would be "strFullName" or "intRecordCount".
+
+2. VARIABLE DECLARATION
+
+- All variables must be declared at the start of the page or procedure where
+they are being used.
+
+- "Option Explicit" must be declared at the start of every ASP page.
+
+3. SESSION AND APPLICATION VARIABLES
+
+- Avoid using Application variables.  All application-wide settings should be
+held in the database.
+
+- Session variables should be used minimally.  User state should be held in
+the database and other data should be made part of query strings or form
+fields.
+
+- All Session and Application variables must start with the prefix "lhd_" to
+avoid conflicts with other IIS applications.
+
+4. PREFIXES
+
+- All variables should start with prefixes outlined in the table below.
+
+Data Type      : Prefix : Example
+---------------------------------
+Boolean        : bln    : blnEnable
+Character      : chr    : chrInitial
+Date/Time      : dtm    : dtmStartDate
+Double         : dbl    : dblDistance
+Error          : err    : errSyntax
+Integer        : int    : intCounter
+Long           : lng    : lngLength
+Memo/Text      : txt    : txtDescription
+Object         : obj    : objMessage
+String         : str    : strFirstName
+Variant        : var    : varUserList
+ADO Record Set : rst    : rstQueryResults
+ADO Connection : cnn    : connADOConnection
