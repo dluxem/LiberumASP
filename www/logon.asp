@@ -74,7 +74,7 @@
           End If
 
           Dim ntUserRes
-          Set ntUserRes = SQLQuery(cnnDB, "SELECT sid FROM tblUsers WHERE uid='" & username & "'")
+          Set ntUserRes = SQLQuery(cnnDB, "SELECT sid FROM tblUsers WHERE (uid='" & username & "') AND (fname IS NOT NULL) OR (uid='" & username & "') AND (email1 IS NOT NULL)")
           If ntUserRes.EOF Then
             Dim ntUpdRes, ntSidRes
             ntUpdRes = SQLQuery(cnnDB, "INSERT INTO tblUsers (sid, uid) VALUES (" & GetUnique(cnnDB, "users") & ", '" & username & "')")

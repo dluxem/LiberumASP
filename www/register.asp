@@ -47,7 +47,7 @@
 
     If Request.Form("create") = 1 Then
       Dim uid, email, password1, password2, fname, phone, location, department, pager
-      Dim firstname, lastname, phone_home, phone_mobile, usrLanguage
+      Dim firstname, lastname, phone_home, phone_mobile, usrLanguage, dateformat
       uid = Left(Lcase(Trim(Request.Form("uid"))), 50)
 
       email = Left(Lcase(Trim(Request.Form("email"))), 50)
@@ -68,6 +68,7 @@
       firstname = Left(Trim(Replace(Request.Form("firstname"), "'", "''")), 25)
       lastname = Left(Trim(Replace(Request.Form("lastname"), "'", "''")), 24)
       fname = firstname & " " & lastname
+      dateformat = Left(Trim(Lcase(Request.Form("dateformat"))), 12)
       if cfg(cnnDB,"useinoutboard") = 1 then
         phone_home = Left(Trim(Replace(Request.Form("phone_home"), "'", "''")), 50)
         phone_mobile = Left(Trim(Replace(Request.Form("phone_mobile"), "'", "''")), 50)
@@ -108,6 +109,7 @@
             "location1 = '" & location & "', " & _
             "department = " & department & ", " & _
             "[language] = " & usrLanguage & ", " & _
+            "dateformat = '" & dateformat & "', " & _
             "[password] = '" & password1 & "'"
         Else
           sqlString = "UPDATE tblUsers SET " & _
@@ -121,6 +123,7 @@
             "phone_mobile = '" & phone_mobile & "', " & _
             "location1 = '" & location & "', " & _
             "[language] = " & usrLanguage & ", " & _
+            "dateformat = '" & dateformat & "', " & _
             "department = " & department
         End If
 
@@ -159,7 +162,7 @@
         newSid = GetUnique(cnnDB, "users")
 
         sqlString = "INSERT INTO tblUsers " & _
-          "(sid, uid, [password], email1, email2, fname, firstname, lastname, phone, phone_home, phone_mobile, location1, [language], department) VALUES (" & _
+          "(sid, uid, [password], email1, email2, fname, firstname, lastname, phone, phone_home, phone_mobile, location1, dateformat, [language], department) VALUES (" & _
           newSid & ", " & _
           "'" & uid & "', " & _
           "'" & password1 & "', " & _
@@ -172,6 +175,7 @@
           "'" & phone_home & "', " & _
           "'" & phone_mobile & "', " & _
           "'" & location & "', " & _
+          "'" & dateformat & "', " & _
           usrLanguage & ", " & _
           department & _
           ")"
@@ -184,7 +188,7 @@
     End If
 
     Dim frm_email, frm_fname, frm_phone, frm_location, frm_department, frm_pager
-    Dim frm_firstname, frm_lastname, frm_phone_home, frm_phone_mobile, frm_usrLanguage
+    Dim frm_firstname, frm_lastname, frm_phone_home, frm_phone_mobile, frm_usrLanguage, frm_dateformat
     If Edit Then
       frm_email = Usr(cnnDB, sid, "email1")
       frm_phone = Usr(cnnDB, sid, "phone")
@@ -193,12 +197,16 @@
       frm_pager = Usr(cnnDB, sid, "email2")
       frm_firstname = Usr(cnnDB, sid, "firstname")
       frm_lastname = Usr(cnnDB, sid, "lastname")
+      frm_dateformat = Usr(cnnDB, sid, "dateformat")
       frm_usrLanguage = Usr(cnnDB, sid, "[language]")
       if cfg(cnnDB,"useinoutboard") = 1 then
         frm_phone_home = Usr(cnnDB, sid, "phone_home")
         frm_phone_mobile = Usr(cnnDB, sid, "phone_mobile")
       End If
     End If
+
+    Dim varDateFormatList
+    varDateFormatList = Array("mm/dd/yyyy", "dd/mm/yyyy", "yyyy-mm-dd")
   %>
 
   <div align="center">
@@ -399,6 +407,25 @@
                             rstLang.Close
                           End If
                       %>
+                        </select>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td width="150">
+                        <b><%=lang(cnnDB, "DateFormat")%>: </b>
+                      </td>
+                      <td>
+                        <select name="dateformat">
+                          <%
+                              Dim strDateFormat
+                              For Each strDateFormat In varDateFormatList
+                                If strDateFormat = frm_dateformat Then
+                                    Response.Write "<option value=""" & strDateFormat & """ selected>" & strDateFormat & "</option>" & vbNewLine
+                                Else
+                                    Response.Write "<option value=""" & strDateFormat & """>" & strDateFormat & "</option>" & vbNewLine
+                                End If
+                              Next
+                          %>
                         </select>
                       </td>
                     </tr>

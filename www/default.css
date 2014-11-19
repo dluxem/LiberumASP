@@ -34,16 +34,19 @@ HeadLink {
 table.Narrow {
   font-size: 10pt;
   width: 300px;
+  text-align: left;  
 }
 
 table.Normal {
   font-size: 10pt;
   width: 500px;
+  text-align: left;
 }
 
 table.Wide {
   font-size: 10pt;
   width: 620px
+  text-align: left;
 }
 
 table.Inout {

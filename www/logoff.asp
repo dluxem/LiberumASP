@@ -49,7 +49,7 @@
           <td align="center">
             <%=lang(cnnDB, "Yoursessionhasbeenloggedoff")%>.
             <p>
-            <b><a href="<% = Cfg(cnnDB, "BaseURL") %>/logon.asp"><%=lang(cnnDB, "Clickheretologin")%>.</a></b></p>
+            <b><a href="/logon.asp"><%=lang(cnnDB, "Clickheretologin")%>.</a></b></p>
           </td>
         </tr>
       </table>

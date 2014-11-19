@@ -49,7 +49,7 @@ Sub SetAppVariables
 	' Enable Debugging:
 	' Set to true to view full MS errors and other debug information
 	' printed.  (This will disable most On Error Resume Next statements.)
-	Application("Debug") = False
+	Application("Debug") = false
 
 
 End Sub

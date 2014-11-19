@@ -31,6 +31,13 @@
 <head>
 <title><%=lang(cnnDB, "HelpDesk")%> - <%=lang(cnnDB, "NewProblem")%></title>
 <link rel="stylesheet" type="text/css" href="../default.css">
+<script language="JavaScript">
+  function openChild(file,window) {
+      childWindow=open(file,window,'resizable=yes,width=560,height=300');
+      if (childWindow.opener == null) childWindow.opener = self;
+      
+  }
+</script>
 </head>
 <body>
 
@@ -50,7 +57,7 @@
   If blnSubmitNew Then
     ' Get the information from the form fields
     Dim uid, uemail, uphone, ulocation, category, department, title, description
-    Dim priority, status, rep, time_spent, solution, entered_by, uselectid, kb
+    Dim priority, status, rep, time_spent, solution, entered_by, uselectid, kb, duedate, intEmailSent
 
     uselectid = Request.Form("uselectid")
     uid = Request.Form("uid")
@@ -66,12 +73,19 @@
     rep = Cint(Request.Form("rep"))
     time_spent = Cint(Request.Form("time_spent"))
     solution = Request.Form("solution")
+    duedate = ConvertFormattedDate(Request.Form("duedate"))
 
     If Request.Form("kb") = "on" Then
       kb = 1
     Else
       kb = 0
     End If
+	
+	If (Request.Form("noemail")<>"on") And (status=Cfg(cnnDB, "CloseStatus")) Then
+	  intEmailSent = 1
+	Else
+	  intEmailSent = 0
+	End If
 
     ' Check for required fields (uemail, category, department, title, description)
     If uselectid <> 0 then 
@@ -100,10 +114,14 @@
 
     if Len(title)=0 Then
       Call DisplayError(1, lang(cnnDB, "Title"))
-    Elseif Len(title) > 50 Then
+    Elseif Len(title) > 255 Then
       title = Trim(title)
-      title = Left(title, 50)
+      title = Left(title, 255)
     End if
+
+    If Not IsDate(duedate) Then
+      Call DisplayError(1, lang(cnnDB, "DueDate"))
+    End If
 
     if Len(description)=0 Then
       Call DisplayError(1, lang(cnnDB, "Description"))
@@ -117,7 +135,7 @@
     Dim id
 
     Dim dname, depRes
-    Set depRes = SQLQuery(cnnDB, "SELECT dname FROM departments WHERE department_id=" & Request.Form("department"))
+    Set depRes = SQLQuery(cnnDB, "SELECT dname FROM departments WHERE department_id=" & department)
     dname = depRes("dname")
 
     Dim cname, catRes
@@ -145,19 +163,19 @@
     ' If status is closed, then include the closed date/time
       If status = Cfg(cnnDB, "CloseStatus") Then
         probStr = "INSERT INTO problems (id, uid, uemail, uphone, ulocation, " & _
-        "category, department, title, description, priority, status, start_date, rep, time_spent, " & _
-        "close_date, entered_by, solution, kb) " & _
+        "category, department, title, description, priority, status, start_date, due_date, rep, time_spent, " & _
+        "close_date, first_response, entered_by, solution, kb, emailsent) " & _
         "VALUES (" & id & ",'" & uid & "','" & uemail & "','" & uphone & "','" & _
         ulocation & "'," & category & "," & department & ",'" & title & "','" & _
-        description & "'," & priority & "," & status & "," & SQLDate(Now, lhdAddSQLDelim) & "," & rep & "," & time_spent & _
-        "," & SQLDate(Now, lhdAddSQLDelim) & "," & entered_by & ",'" & solution & "', " & kb & ")"
+        description & "'," & priority & "," & status & "," & SQLDate(Now, lhdAddSQLDelim) & "," & SQLDate(duedate, lhdAddSQLDelim) & "," & rep & "," & time_spent & _
+        "," & SQLDate(Now, lhdAddSQLDelim) & "," & SQLDate(Now, lhdAddSQLDelim) & ","& entered_by & ",'" & solution & "', " & kb & ", " & intEmailSent & ")"
       Else
         probStr = "INSERT INTO problems (id, uid, uemail, uphone, ulocation, " & _
-        "category, department, title, description, priority, status, start_date, rep, time_spent, " & _
+        "category, department, title, description, priority, status, start_date, due_date, rep, time_spent, " & _
         "entered_by, solution, kb) " & _
         "VALUES (" & id & ",'" & uid & "','" & uemail & "','" & uphone & "','" & _
         ulocation & "'," & category & "," & department & ",'" & title & "','" & _
-        description & "'," & priority & "," & status & "," & SQLDate(Now, lhdAddSQLDelim) & "," & rep & "," & time_spent & _
+        description & "'," & priority & "," & status & "," & SQLDate(Now, lhdAddSQLDelim) & ","  & SQLDate(duedate, lhdAddSQLDelim) & "," & rep & "," & time_spent & _
         "," & entered_by & ",'" & solution & "'," & kb & ")"
       End If
 
@@ -203,7 +221,7 @@
 
   Dim rstDepList, rstCatList, rstStatList, rstPriList, rstRepList
 %>
-<form action="new.asp" method="POST">
+<form action="new.asp" method="POST" name="newProbForm">
 <input type="hidden" name="save" value="1">
 
 <div align="center">
@@ -300,27 +318,11 @@
             </tr>
             <tr>
               <td>
-                <b><%=lang(cnnDB, "SelectUser")%>:</b>
+                <b><a href="javascript:void(0)" onClick="openChild('selectuser.asp','userselect');"><%=lang(cnnDB, "SelectUser")%></a>: </b>
               </td>
               <td>
-                <select name="uselectid">
-                  <option value="0" selected><%=lang(cnnDB, "SelectUser")%></option>
-                  <%
-                    ' Get list of users to diplay
-                    Dim rstUser
-                    Set rstUser = SQLQuery(cnnDB, "SELECT * FROM tblUsers WHERE sid > 0 ORDER BY uid ASC")
-                    If not rstUser.EOF Then
-                      Do While Not rstUser.EOF 
-                      %>
-                        <option value="<% = rstUser("sid")%>">
-                        <% = rstUser("uid") %>&nbsp;(<% = rstUser("fname") %>)
-                        </option>
-                      <% 
-                      rstUser.MoveNext
-                      Loop
-                    End If
-                  %>
-                </select>
+                <input type="hidden" name="uselectid" value="0">
+                <div id="selectUserText"></div>
               </td>
             </tr>
           <% 
@@ -433,6 +435,14 @@
                 End If
               %>
               </SELECT><em>*</em>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <b><%=lang(cnnDB, "DueDate")%>:</b>
+            </td>
+            <td>
+              <input type="text" name="duedate" size="10" maxlength="12" value="<% = DisplayDate(DateAdd("d", 1, Now()), lhdDateOnly) %>"><em>*</em>&nbsp;<font size="-2">(<% = Usr(cnnDB, sid, "dateformat") %>)</font>
             </td>
           </tr>
           <tr>

@@ -240,7 +240,7 @@
       If Len(Request.Form("num")) > 0 Then
         numToDisplay = CInt(Request.Form("num"))
       Else
-        numToDisplay = 10
+        numToDisplay = 25
       End if
       If Len(Request.Form("start")) > 0 Then
         start = CInt(Request.Form("start"))

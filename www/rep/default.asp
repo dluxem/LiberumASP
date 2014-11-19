@@ -70,27 +70,40 @@
         </td>
       </tr>
     <% End If %>
+    <tr class="Body1">
+      <td align="center">
+        <a href="search.asp"><%=lang(cnnDB, "SearchProblems")%></a>
+      </td>
+    </tr>
     <% If Usr(cnnDB, sid, "RepAccess") <> 1 Then %>
       <tr class="Body1">
         <td valign="center" align="center">
           <br />
           <form method="post" action="view.asp">
-          <%=lang(cnnDB, "Viewproblemsfor")%>: <SELECT NAME="rep_id">
+          <%=lang(cnnDB, "Viewproblemsfor")%>: <SELECT NAME="rep_id" OnChange="this.form.submit()">
           <%
             ' Display a list of users to the rep
             ' can view their problems.
-            Dim replRes
+            Dim replRes, probRes, intProbCount
 
-            Set replRes = SQLQuery(cnnDB, "SELECT * From tblUsers WHERE IsRep = 1 AND RepAccess <> 2 ORDER BY uid ASC")
+            Set replRes = SQLQuery(cnnDB, "SELECT sid, uid FROM tblUsers WHERE IsRep = 1 AND RepAccess <> 2 ORDER BY tblUsers.uid ASC")
             If Not replRes.EOF Then
               Do While Not replRes.EOF
+                Set probRes = SQLQuery(cnnDB, "SELECT COUNT(id) AS ProbCount FROM problems WHERE rep=" & replRes("sid") & " AND status<>" & Cfg(cnnDB, "CloseStatus"))
+                If probRes.EOF Then
+                  intProbCount = 0
+                Else
+                  intProbCount = probRes("ProbCount")
+                  probRes.Close
+                End If
+                Set probRes = Nothing
                 If replRes("sid") = sid Then
               %>
                   <OPTION VALUE="<% = replRes("sid")%>" SELECTED>
-                  <% = replRes("uid") %></OPTION>
+                  (<% = intProbCount %>) <% = replRes("uid") %></OPTION>
                 <% Else %>
                   <OPTION VALUE="<% = replRes("sid")%>">
-                  <% = replRes("uid") %></OPTION>
+                  (<% = intProbCount %>) <% = replRes("uid") %></OPTION>
 
               <% 	End If
                 replRes.MoveNext
@@ -101,11 +114,6 @@
         </td>
       </tr>
     <% End If %>
-    <tr class="Body1">
-      <td align="center">
-        <a href="search.asp"><%=lang(cnnDB, "SearchProblems")%></a>
-      </td>
-    </tr>
     <% If Cfg(cnnDB, "EnableKB") >= 1 Then %>
       <tr class="Head2">
         <td>

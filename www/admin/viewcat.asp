@@ -71,7 +71,7 @@
           Do While Not rstCategories.EOF
         %>
         <tr class="Body1">
-          <td align="center">
+          <td>
             <% = rstCategories("cname") %>
           </td>
           <td align="center">

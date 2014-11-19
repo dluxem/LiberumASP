@@ -23,6 +23,7 @@
   -->
 
   <!-- 	#include file = "../public.asp" -->
+  <!-- 	#include file = "../extension.asp" -->
   <% 
     Dim cnnDB, sid
     Set cnnDB = CreateCon
@@ -41,9 +42,8 @@
       Call CheckUser(cnnDB, sid)
       ' Get the username
 
-      dim uid
+      dim uid, ufname
       uid = Usr(cnnDB, sid, "uid")
-
       ' Get the problem ID
       Dim id
       id = Cint(Request.QueryString("id"))
@@ -59,11 +59,12 @@
       Dim queryStr, rstProblem, rstSolution
 
       queryStr = _
-      "SELECT p.id, p.uid, p.uemail, p.uphone, p.ulocation, d.dname, p.start_date, p.status, s.sname, " & _
-      "p.close_date, c.cname, r.uid As ruid, r.email1 As remail, r.fname, p.title, p.solution, p.description " & _
-      "FROM (((problems AS p " & _
+      "SELECT p.id, p.uid, p.uemail, p.uphone, p.ulocation, d.dname, p.start_date, p.due_date, p.status, s.sname, " & _
+      "p.close_date, c.cname, pri.pname, r.uid As ruid, r.email1 As remail, r.fname, p.title, p.solution, p.description " & _
+      "FROM ((((problems AS p " & _
       "INNER JOIN departments AS d ON p.department = d.department_id) " & _
       "INNER JOIN status AS s ON p.status = s.status_id) " & _
+      "INNER JOIN priority AS pri ON p.priority = pri.priority_id) " & _
       "INNER JOIN tblUsers AS r ON p.rep = r.sid) " & _
       "INNER JOIN categories AS c ON p.category = c.category_id " & _
       "WHERE p.id=" & id & " AND p.uid='" & uid & "'"
@@ -102,6 +103,15 @@
         <tr class="Body1">
           <td colspan="2">
             <table class="Normal" border="0" cellspacing="0">
+			  <tr>
+			    <td colspan="2">
+					<% If rstProblem("status") = Cfg(cnnDB, "CloseStatus") Then %>
+					  <div align="center">
+						<b><a href="../rep/details.asp?id=<% = id %>&reopen=1"><%=lang(cnnDB, "ReopenProblem")%></a></b>
+					  </div>
+					<% End If %>
+				</td>
+			  </tr>
               <tr>
                 <td width="125" valign="top">
                   <b><%=lang(cnnDB, "ProblemID")%>:</b>
@@ -150,6 +160,14 @@
                   <% = DisplayDate(rstProblem("start_date"), lhdDateTime) %>
                 </td>
               </tr>
+              <tr>
+                <td>
+                  <b><%=lang(cnnDB, "DueDate")%>:</b>
+                </td>
+                <td>
+                  <% = DisplayDate(rstProblem("due_date"), lhdDateOnly) %>
+                </td>
+              </tr>
               <% If rstProblem("status") = Cfg(cnnDB, "CloseStatus") Then %>
                 <tr>
                   <td>
@@ -178,6 +196,14 @@
               </tr>
               <tr>
                 <td>
+                  <b><%=lang(cnnDB, "Priority")%>:</b>
+                </td>
+                <td>
+                  <% = rstProblem("pname") %>
+                </td>
+              </tr>
+              <tr>
+                <td>
                   <b><%=lang(cnnDB, "AssignedTo")%>:</b>
                 </td>
                 <td>
@@ -193,13 +219,13 @@
                 </td>
               </tr>
             </table>
-          </td>
+		  </td>
         </tr>
-        <tr class="Head2">
-          <td>
-            <%=lang(cnnDB, "ProblemInformation")%>:
-          </td>
-        </tr>
+		<tr class="Head2">
+		  <td>
+		    <%=lang(cnnDB, "ProblemInformation")%>:
+		  </td>
+		</tr>
         <tr class="Body1">
           <td>
             <form>

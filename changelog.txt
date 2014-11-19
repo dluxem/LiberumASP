@@ -2,6 +2,18 @@
 	-----------------
 
 Change Log:
+v0.97.4 (2014-11-18)
+New:
+* Add "Due Date" field to problems
+* Allow users to select format of date displays
+* Record "first_response" time in the DB for reporting purposes
+* Allow closed tickets to be reopened
+* Expand the problem title field to 255 characters
+* Default list/search results to 25 items
+* Allow user-settable priorities on Problems
+Fix:
+* Allow searching dates beyond 2010
+
 v0.97.3 (08/28/2002)
 New:
 * Added French language file

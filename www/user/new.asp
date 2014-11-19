@@ -175,6 +175,41 @@
                       </SELECT><em>*</em>
                     </td>
                   </tr>
+                  <tr>
+                    <td>
+                      <b><%=lang(cnnDB, "Priority")%>:</b>
+                    </td>
+                    <td>
+                      <SELECT NAME="priority">
+                      <%
+                        Dim rstPriList
+                        Set rstPriList = SQLQuery(cnnDB, "SELECT * From priority WHERE priority_id > 0 ORDER BY priority_id ASC")
+                        If Not rstPriList.EOF Then
+                        Do While Not rstPriList.EOF
+                        If rstPriList("priority_id") = Cfg(cnnDB, "DefaultPriority") Then
+                        %>
+                        <OPTION VALUE="<% = rstPriList("priority_id")%>" SELECTED>
+                        <% = rstPriList("pname") %></OPTION>
+                        <% Else %>
+                        <OPTION VALUE="<% = rstPriList("priority_id")%>">
+                        <% = rstPriList("pname") %></OPTION>
+
+                      <% 	End If
+                        rstPriList.MoveNext
+                        Loop
+                        End If
+                      %>
+                      </SELECT><em>*</em>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <b><%=lang(cnnDB, "DueDate")%>:</b>
+                    </td>
+                    <td>
+                      <input type="text" name="duedate" size="10" maxlength="12" value="<% = DisplayDate(DateAdd("d", 1, Now()), lhdDateOnly) %>"><em>*</em>&nbsp;<font size="-2">(<% = Usr(cnnDB, sid, "dateformat") %>)</font>
+                    </td>
+                  </tr>
                 </table>
               </div>
             </td>
@@ -208,6 +243,7 @@
       ' close record sets
       rstCatList.Close
       rstDepList.Close
+      rstPriList.Close
 
       Call DisplayFooter(cnnDB, sid)
       cnnDB.Close

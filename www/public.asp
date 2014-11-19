@@ -1,3 +1,5 @@
+  <!--	#include file = "settings.asp" -->
+  <!-- 	#include file = "extension.asp" -->
 <SCRIPT LANGUAGE=VBScript RUNAT=SERVER>
 
 '  Liberum Help Desk, Copyright (C) 2000-2001 Doug Luxem
@@ -11,6 +13,7 @@
 '            throughout the site.  Each page has an include for
 '            this file.
 
+  
 ' ################################
 ' PAGE START CODE
 ' ################################
@@ -150,6 +153,9 @@ End Sub
 ' CreateCon:
 ' Returns a ADO Connection object
 Function CreateCon
+	' Make sure application is initialized
+	Call SetAppVariables
+	
 	Dim strConn, cnnDB
 	' Check for usage of SQL securing or integrated security and
 	' use the correct connection string
@@ -173,6 +179,9 @@ Function CreateCon
 			strConn = "DSN=" & Application("DSN_Name")
 
 	End Select
+	
+	' Override the DBType & settings and manually set the connection string
+	' strConn = "Provider=sqloledb;Data Source=yourdbserver;Initial Catalog=helpdesk;User Id=sa;Password=sapassword"
 
 	' Keep Errors from occuring
 	If Not Application("Debug") Then
@@ -181,6 +190,9 @@ Function CreateCon
 
 	' Create and open the database connection and save it as a
 	' session variable
+	If Application("Debug") Then
+		Response.Write("<p><b>Creating Connection...</b></p>")
+	End If
 	Set cnnDB = Server.CreateObject("ADODB.Connection")
 	cnnDB.Open(strConn)
 
@@ -195,11 +207,15 @@ End Function
 ' GetSid:
 ' Returns the user's sid or 0
 Function GetSid
-	If Session("lhd_sid") > 0 Then
-		GetSid = Session("lhd_sid")
+	If IsNull(Session("lhd_sid")) Then
+		GetSide = 0
 	Else
-		GetSid = 0
-	End If
+		If Session("lhd_sid") > 0 Then
+			GetSid = Session("lhd_sid")
+		Else
+			GetSid = 0
+		End If
+	End if
 End Function
 
 
@@ -345,20 +361,20 @@ Sub DisplayFooter(cnnDB, sid)
 	If (Not userChkRes.EOF) AND (sid <> 0) Then
     Response.Write("<p><div align=""center"">")
     If Usr(cnnDB, sid, "IsRep") > 0 Then
-      Response.Write "<a href=""" & Cfg(cnnDB, "BaseURL") & "/user"">" & lang(cnnDB, "UserMenu") & "</a> | " & _
-        "<a href=""" & Cfg(cnnDB, "BaseURL") & "/rep"">" & lang(cnnDB, "RepMenu") & "</a> | "
+      Response.Write "<a href=""/user"">" & lang(cnnDB, "UserMenu") & "</a> | " & _
+        "<a href=""/rep"">" & lang(cnnDB, "RepMenu") & "</a> | "
     Else
-      Response.Write("<a href=""" & Cfg(cnnDB, "BaseURL") & "/user"">" & lang(cnnDB, "Menu") & "</a> | ")
+      Response.Write("<a href=""/user"">" & lang(cnnDB, "Menu") & "</a> | ")
     End If
     If Cfg(cnnDB, "UseInoutBoard") = 1 Then
-      Response.Write("<a href=""" & Cfg(cnnDB, "BaseURL") & "/inout/default.asp"">" & lang(cnnDB, "InOutBoard") & "</a> | ")
+      Response.Write("<a href=""/inout/default.asp"">" & lang(cnnDB, "InOutBoard") & "</a> | ")
     End If
-		Response.Write "<a href=""" & Cfg(cnnDB, "BaseURL") & "/logoff.asp"">" & lang(cnnDB, "LogOff") & "</a>" & _
+		Response.Write "<a href=""/logoff.asp"">" & lang(cnnDB, "LogOff") & "</a>" & _
 		  "</div></p>"
 	End If
 	Response.Write"<p><hr width=""500"">" & vbNewLine & _
 	  "<div align=""center""><font size=""-1"">" & _
-	  "<a href=""http://www.liberum.org"">" & lang(cnnDB, "LiberumHelpDesk") & "</a>, " & lang(cnnDB, "Copyright") & ". " & lang(cnnDB, "Pleaseviewthe") & " <a href=""" & Cfg(cnnDB, "BaseURL") & "/license.html"">" & lang(cnnDB, "license") & "</a>." & _
+	  "<a href=""http://www.liberum.org"">" & lang(cnnDB, "LiberumHelpDesk") & "</a>, " & lang(cnnDB, "Copyright") & ". " & lang(cnnDB, "Pleaseviewthe") & " <a href=""/license.html"">" & lang(cnnDB, "license") & "</a>." & _
 	  "</font></div></p>"
 	userChkRes.Close
 End Sub
@@ -432,7 +448,8 @@ Sub CheckUser(cnnDB, sid)
 	If (userchkRes.EOF) OR (sid = 0) Then
 		Dim reAddr
 
-		reAddr = Cfg(cnnDB, "BaseURL") & "/logon.asp?URL=" & _
+		' Cfg(cnnDB, "BaseURL") &
+		reAddr = "/logon.asp?URL=" & _
 			Request.ServerVariables("PATH_INFO")
 		If Len(Request.ServerVariables("QUERY_STRING")) > 0 Then
 			reAddr = reAddr & _
@@ -457,7 +474,7 @@ Sub CheckRep(cnnDB, sid)
 	If (userchkRes.EOF) OR (sid = 0) Then
 		Dim reAddr
 
-		reAddr = Cfg(cnnDB, "BaseURL") & "/logon.asp?URL=" & _
+		reAddr = "/logon.asp?URL=" & _
 			Request.ServerVariables("PATH_INFO")
 		If Len(Request.ServerVariables("QUERY_STRING")) > 0 Then
 			reAddr = reAddr & _
@@ -522,7 +539,7 @@ End Sub
 
 ' SendMail:
 ' Sends mail using the supported system set in global.asa
-Sub SendMail (strToAddr, strSubject, strBody, cnnDB)
+Sub SendMail (strToAddr, strFromAddr, strFromName, strSubject, strBody, cnnDB)
 
 Dim Mail
 
@@ -539,15 +556,15 @@ Select Case Cfg(cnnDB, "EmailType")
 		Mail.Subject = strSubject
 		Mail.To = strToAddr
 		Mail.Body = strBody
-		Mail.Send(Cfg(cnnDB, "HDName") & "<" & Cfg(cnnDB, "HDReply") & ">")
+		Mail.Send(strFromName & "<" & strFromAddr & ">")
 		Set Mail = Nothing
 
 	Case 2	'Jmail
 		On Error Resume Next ' Use Jmail logging
 		Set Mail = Server.CreateObject("Jmail.Message")
 		Mail.Logging = True
-		Mail.From = Cfg(cnnDB, "HDReply")
-		Mail.FromName = Cfg(cnnDB, "HDName")
+		Mail.From = strFromAddr
+		Mail.FromName = strFromName
 		Mail.AddRecipient strToAddr
 		Mail.Subject = strSubject
 		Mail.Body = strBody
@@ -561,8 +578,8 @@ Select Case Cfg(cnnDB, "EmailType")
 	Case 3	'ASPEmail
 		Set Mail = Server.CreateObject("Persits.MailSender")
 		Mail.Host = Cfg(cnnDB, "SMTPServer")
-		Mail.From = Cfg(cnnDB, "HDReply")
-		Mail.FromName = Cfg(cnnDB, "HDName")
+		Mail.From = strFromAddr
+		Mail.FromName = strFromName
 		Mail.AddAddress strToAddr
 		Mail.Subject = strSubject
 		Mail.Body = strBody
@@ -571,14 +588,46 @@ Select Case Cfg(cnnDB, "EmailType")
 
   Case 4  ' ASPMail
     Set Mail = Server.CreateObject("SMTPsvg.Mailer")
-    Mail.FromName = Cfg(cnnDB, "HDName")
-    Mail.FromAddress = Cfg(cnnDB, "HDReply")
+    Mail.FromName = strFromName
+    Mail.FromAddress = strFromAddr
     Mail.RemoteHost = Cfg(cnnDB, "SMTPServer")
     Mail.AddRecipient "Help Desk User", strToAddr
     Mail.Subject = strSubject
     Mail.BodyText = strBody
     Mail.SendMail
-   
+  Case 5  ' CDOSYS
+    DIM strIncomingMailServer, objCDOSYSMail, objCDOSYSCon
+    'Create the e-mail server object
+	strIncomingMailServer = Cfg(cnnDB, "SMTPServer")
+	Set objCDOSYSMail = Server.CreateObject("CDO.Message")
+    Set objCDOSYSCon = Server.CreateObject ("CDO.Configuration")
+
+    'Set and update fields properties
+	With objCDOSYSCon
+        'Out going SMTP server
+        .Fields("http://schemas.microsoft.com/cdo/configuration/smtpserver") = strIncomingMailServer
+        'SMTP port
+        .Fields("http://schemas.microsoft.com/cdo/configuration/smtpserverport")  = 25
+        'CDO Port
+        .Fields("http://schemas.microsoft.com/cdo/configuration/sendusing") = 2
+        '.Timeout
+        .Fields("http://schemas.microsoft.com/cdo/configuration/smtpconnectiontimeout") = 60
+		.Fields.Update
+   End With
+   'Update the CDOSYS Configuration 
+   Set objCDOSYSMail.Configuration = objCDOSYSCon
+   With objCDOSYSMail
+	.From = """" & strFromName & """ <" & strFromAddr & ">"
+	'.From = Cfg(cnnDB, "HDName") & " <" & Cfg(cnnDB, "HDReply") & ">"
+	.To = strToAddr
+	.Subject = strSubject
+	'.HTMLBody = strBody 'Set the e-mail body format (HTMLBody=HTML TextBody=Plain)
+	.TextBody = strBody
+	'Send the e-mail
+	If NOT strIncomingMailServer = "" Then .Send
+   End with
+  'Close the server mail object
+   Set objCDOSYSMail = Nothing 
 End Select
 
 If Err.Number <> 0 Then
@@ -591,22 +640,24 @@ End Sub
 ' Message:
 ' Parses and sends an email
 Sub eMessage (cnnDB, eType, id, strToAddr)
-  Dim emailRes
-	Set emailRes = SQLQuery(cnnDB, "Select subject, body FROM tblEmailMsg WHERE type='" & eType & "'")
+    ' Get the email message from the database
+	Dim emailRes
+	Set emailRes = SQLQuery(cnnDB, "Select subject, body, bodyhtml FROM tblEmailMsg WHERE type='" & eType & "'")
 	If emailRes.EOF Then
 		Call DisplayError(3, lang(cnnDB, "Nomessageoftype") & " " & eType & " " & lang(cnnDB, "wasfoundinthedatabase") & ".")
 	End If
 
-	Dim subject, body
+	Dim subject, body, bodyHTML, strFromAddr, strFromName
 	subject = emailRes("subject")
 	body = emailRes("body")
+	bodyHTML = emailRes("bodyhtml")
 
 	emailRes.Close
 
 	Dim queryStr
 
 	queryStr = _
-		"SELECT p.id, p.uid, p.uemail, p.uphone, p.ulocation, d.dname, p.start_date, p.status, s.sname, " & _
+		"SELECT p.id, p.uid, p.uemail, p.uphone, p.ulocation, d.dname, p.start_date, p.due_date, p.status, s.sname, " & _
 		"p.close_date, pri.pname, c.cname, p.rep, p.title, p.solution, p.description " & _
 		"FROM (((problems AS p " & _
 		"INNER JOIN departments AS d ON p.department = d.department_id) " & _
@@ -615,40 +666,60 @@ Sub eMessage (cnnDB, eType, id, strToAddr)
 		"INNER JOIN categories AS c ON p.category = c.category_id " & _
 		"WHERE p.id=" & id
 
-  Dim probRes, repRes, userRes, notesRes, notes
+	Dim probRes, repRes, userRes, notesRes, notes, notesHTML
 	Set probRes = SQLQuery(cnnDB, queryStr)
 	Set repRes = SQLQuery(cnnDB, "SELECT uid, email1, fname FROM tblUsers WHERE sid=" & probRes("rep"))
 	Set userRes = SQLQuery(cnnDB, "SELECT fname FROM tblUsers WHERE uid='" & probRes("uid") & "'")
-  Set notesRes = SQLQuery(cnnDB, "SELECT * FROM tblNotes WHERE id=" & id & " AND private=0 ORDER BY addDate ASC")
+	If InStr(eType, "rep") > 0 Then
+      Set notesRes = SQLQuery(cnnDB, "SELECT * FROM tblNotes WHERE id=" & id & " ORDER BY addDate ASC")
+	Else
+	  Set notesRes = SQLQuery(cnnDB, "SELECT * FROM tblNotes WHERE id=" & id & " AND private=0 ORDER BY addDate ASC")
+	End If
 
-  If probRes.EOF Then
+	If InStr(eType, "user") > 0 Then
+		strFromAddr = repRes("email1")
+		strFromName = repRes("fname")
+	Else
+		strFromAddr = Cfg(cnnDB, "HDReply")
+		strFromName = Cfg(cnnDB, "HDName")
+	End If
+
+
+	If probRes.EOF Then
 		cnnDB.Close
 		Call DisplayError(3, lang(cnnDB, "Problem") & " " & id & " " & lang(cnnDB, "doesnotexist") & ". " & lang(cnnDB, "Cannotsendmail") & ".")
 	End If
 
-  If Not notesRes.EOF Then
-    Do While Not notesRes.EOF
-      If Len(notes) > 0 Then
-        notes = notes & vbNewLine
-      End If
-      notes = notes & "[" & notesRes("addDate") & " - " & notesRes("uid") & "]"
-      notes = notes & vbNewLine
-      notes = notes & notesRes("note") & vbNewLine
-      notesRes.MoveNext
-    Loop
-  Else
-    notes = " "
-  End If
-  notesRes.Close
+		notes = ""
+		notesHTML = ""
+		
+	If Not notesRes.EOF Then
+		Do While Not notesRes.EOF
+		If Len(notes) > 0 Then
+			notes = notes & vbNewLine
+		End If
+		notes = notes & "[" & notesRes("addDate") & " - " & notesRes("uid") & "]"
+		notes = notes & vbNewLine
+		notes = notes & notesRes("note") & vbNewLine
+		notesRes.MoveNext
+		Loop
+	Else
+		notes = " "
+	End If
+	
+	notesRes.Close
+	
+	' Parse out the notes array for HTML formatting
 
   On Error Resume Next
-  body = Replace(body, "[problemid]", probRes("id"))
+	body = Replace(body, "[problemid]", probRes("id"))
 	body = Replace(body, "[title]", probRes("title"))
 	body = Replace(body, "[description]", probRes("description"))
 	body = Replace(body, "[status]", probRes("sname"))
 	body = Replace(body, "[priority]", probRes("pname"))
 	body = Replace(body, "[startdate]", DisplayDate(probRes("start_date"), lhdDateTime))
 	body = Replace(body, "[closedate]", DisplayDate(probRes("close_date"), lhdDateTime))
+	body = Replace(body, "[duedate]", DisplayDate(probRes("due_date"), lhdDateOnly))
 	body = Replace(body, "[category]", probRes("cname"))
 	body = Replace(body, "[department]", probRes("dname"))
 	body = Replace(body, "[phone]", probRes("uphone"))
@@ -663,8 +734,41 @@ Sub eMessage (cnnDB, eType, id, strToAddr)
 	body = Replace(body, "[remail]", repRes("email1"))
 	body = Replace(body, "[uurl]", Cfg(cnnDB, "BaseURL") & "/user/view.asp?id=" & id)
 	body = Replace(body, "[rurl]", Cfg(cnnDB, "BaseURL") & "/rep/view.asp?id=" & id)
-  body = Replace(body, "[notes]", notes)
+    body = Replace(body, "[notes]", notes)
 
+    
+	' urlencoded
+	body = Replace(body, "[u_title]", Server.URLEncode(probRes("title")))
+	body = Replace(body, "[u_rfname]", Server.URLEncode(repRes("fname")))
+	
+	bodyHTML = Replace(bodyHTML, "[problemid]", probRes("id"))
+	bodyHTML = Replace(bodyHTML, "[title]", probRes("title"))
+	bodyHTML = Replace(bodyHTML, "[description]", probRes("description"))
+	bodyHTML = Replace(bodyHTML, "[status]", probRes("sname"))
+	bodyHTML = Replace(bodyHTML, "[priority]", probRes("pname"))
+	bodyHTML = Replace(bodyHTML, "[startdate]", DisplayDate(probRes("start_date"), lhdDateTime))
+	bodyHTML = Replace(bodyHTML, "[closedate]", DisplayDate(probRes("close_date"), lhdDateTime))
+	bodyHTML = Replace(bodyHTML, "[duedate]", DisplayDate(probRes("due_date"), lhdDateOnly))
+	bodyHTML = Replace(bodyHTML, "[category]", probRes("cname"))
+	bodyHTML = Replace(bodyHTML, "[department]", probRes("dname"))
+	bodyHTML = Replace(bodyHTML, "[phone]", probRes("uphone"))
+	bodyHTML = Replace(bodyHTML, "[location]", probRes("ulocation"))
+	bodyHTML = Replace(bodyHTML, "[solution]", probRes("solution"))
+	bodyHTML = Replace(bodyHTML, "[baseurl]", Cfg(cnnDB, "BaseURL"))
+	bodyHTML = Replace(bodyHTML, "[uid]", probRes("uid"))
+	bodyHTML = Replace(bodyHTML, "[ufname]", userRes("fname"))
+	bodyHTML = Replace(bodyHTML, "[uemail]", probRes("uemail"))
+	bodyHTML = Replace(bodyHTML, "[rid]", repRes("uid"))
+	bodyHTML = Replace(bodyHTML, "[rfname]", repRes("fname"))
+	bodyHTML = Replace(bodyHTML, "[remail]", repRes("email1"))
+	bodyHTML = Replace(bodyHTML, "[uurl]", Cfg(cnnDB, "BaseURL") & "/user/view.asp?id=" & id)
+	bodyHTML = Replace(bodyHTML, "[rurl]", Cfg(cnnDB, "BaseURL") & "/rep/view.asp?id=" & id)
+    bodyHTML = Replace(bodyHTML, "[notes]", notesHTML)
+    
+	' urlencoded
+	bodyHTML = Replace(bodyHTML, "[u_title]", Server.URLEncode(probRes("title")))
+	bodyHTML = Replace(bodyHTML, "[u_rfname]", Server.URLEncode(repRes("fname")))
+	
 	subject = Replace(subject, "[problemid]", probRes("id"))
 	subject = Replace(subject, "[title]", probRes("title"))
 	subject = Replace(subject, "[description]", probRes("description"))
@@ -672,6 +776,7 @@ Sub eMessage (cnnDB, eType, id, strToAddr)
 	subject = Replace(subject, "[priority]", probRes("pname"))
 	subject = Replace(subject, "[startdate]", DisplayDate(probRes("start_date"), lhdDateTime))
 	subject = Replace(subject, "[closedate]", DisplayDate(probRes("close_date"), lhdDateTime))
+    subject = Replace(subject, "[duedate]", DisplayDate(probRes("due_date"), lhdDateOnly))
 	subject = Replace(subject, "[category]", probRes("cname"))
 	subject = Replace(subject, "[department]", probRes("dname"))
 	subject = Replace(subject, "[phone]", probRes("uphone"))
@@ -689,8 +794,7 @@ Sub eMessage (cnnDB, eType, id, strToAddr)
 
   Err.Clear
   On Error GoTo 0
-
-	Call SendMail (strToAddr, Subject, Body, cnnDB)
+	Call SendMailHTML (strToAddr, strFromAddr, strFromName, Subject, Body, BodyHTML, cnnDB)
 End Sub
 
 ' FixDay:
@@ -795,7 +899,7 @@ Function DisplayDate(dtDate, intFormat)
 
 
     ' ###### CHANGE THIS STRING TO MATCH LOCAL DATE FORMAT ######
-    strLocalDate = "mm/dd/yyyy"
+    strLocalDate = Usr(cnnDB, sid, "dateformat")
     ' ###########################################################
 
 
@@ -813,6 +917,57 @@ Function DisplayDate(dtDate, intFormat)
     DisplayDate = strLocalDate
   Else
     DisplayDate = ""
+  End If
+End Function
+
+' ConvertFormattedDate
+' Takes a display formated date and returns
+' a VB date
+Function ConvertFormattedDate (strInputDate)
+  Dim strUserFormat, strDay, strMonth, strYear, strSplitChar, varUser, varInput
+  ConvertFormattedDate = Null
+  strUserFormat = Usr(cnnDB, sid, "dateformat")
+  Dim intChar
+  intChar = 1
+  Do Until NOT ((Mid(strUserFormat, intChar, 1) >= "a") AND (Mid(strUserFormat, intChar, 1) <= "z"))
+    intChar = intChar + 1
+  Loop
+  strSplitChar = Mid(strUserFormat, intChar, 1)
+  varUser = Split(strUserFormat, strSplitChar)
+  varInput = Split(strInputDate, strSplitChar)
+  If Ubound(varInput) = 2 Then
+    Dim strUserSection, intInputIndex
+    intInputIndex = 0
+    For Each strUserSection In varUser
+      Select Case strUserSection
+        Case "dd"
+          strDay = varInput(intInputIndex)
+        Case "mm"
+          strMonth = varInput(intInputIndex)
+        Case "yy"
+          strYear = varInput(intInputIndex)
+        Case "yyyy"
+          strYear = varInput(intInputIndex)
+       End Select
+       intInputIndex = intInputIndex + 1
+    Next
+    Select Case Len(strYear)
+      Case 2
+        strYear = "20" & strYear
+      Case 4
+        ' do nothing
+      Case Else
+        strYear = Null
+     End Select
+    On Error Resume Next
+    If IsNumeric(strYear) AND IsNumeric(strMonth) AND IsNumeric(strDay) Then
+      ConvertFormattedDate = CDate(strYear & "-" & strMonth & "-" & strDay)
+    End If
+    If Err.Number <> 0 Then
+      ConvertFormattedDate = DateAdd(d, 1, Now())
+    End If
+    On Error Goto 0
+
   End If
 End Function
 </SCRIPT>

@@ -63,7 +63,7 @@
             strSubject = "Test Message"
             strBody = "This is a test message from Liberum Help Desk"
             
-            Call SendMail (strTo, strSubject, strBody, cnnDB)
+            Call SendMail (strTo, Cfg(cnnDB, "HDReply"), Cfg(cnnDB, "HDName"), strSubject, strBody, cnnDB)
             Response.Write "<tr class=""Head2"" align=""center""><td>" & Lang(cnnDB,"Messagesentto") & " " & strTo & "</td></tr>"
            	rstConfig.Close
           End if

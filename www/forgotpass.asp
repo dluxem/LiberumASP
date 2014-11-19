@@ -53,7 +53,7 @@
         vbNewLine & _
         "Log in to the help desk @ " & Cfg(cnnDB, "BaseURL")
 
-        Call SendMail(userRes("email1"), strSubject, strBody, cnnDB)
+        Call SendMail(userRes("email1"), Cfg(cnnDB, "HDReply"), Cfg(cnnDB, "HDName"), strSubject, strBody, cnnDB)
 
         success = TRUE
       End IF

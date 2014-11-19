@@ -37,8 +37,10 @@
 <body>
 
 <%
-	' Check if user has permissions for this page
-	Call CheckRep(cnnDB, sid)
+	' Check if user has permissions for this page (unless using reopen link)
+	If Cint(Request.QueryString("reopen")) <> 1 Then
+	  Call CheckRep(cnnDB, sid)
+	End if
 
 	' Get the problem ID
 	Dim id, blnUpdate, strUpdateMessage
@@ -50,12 +52,13 @@
   End If
 
   Dim uid, uemail, uphone, ulocation, category, department, title, description, kb
-  Dim priority, status, rep, time_spent, solution, notes, clost_date, start_date, close_date
+  Dim priority, status, rep, time_spent, solution, notes, clost_date, start_date, close_date, duedate
+  Dim blnNotifyRep
 
   ' ===============================
   ' Update the problem
   If blnUpdate Then
-    Dim oldrep
+    Dim oldrep, blnFirstResponse
 
     ' Get the problem data from the form fields.
     id = Request.Form("id")
@@ -73,13 +76,16 @@
     time_spent = Request.Form("time_spent")
     solution = Request.Form("solution")
     notes = Request.Form("notes")
+    duedate = ConvertFormattedDate(Request.Form("duedate"))
 
     If Request.Form("kb") = "on" Then
       kb = 1
     Else
       kb = 0
     End If
+	
 
+	
   ' Check for required fields (uemail, category, department, title, description)
 
     if Len(uid)=0 Then
@@ -94,9 +100,14 @@
       Call DisplayError(1, Lang(cnnDB, "Title"))
     End if
 
+    If Not IsDate(duedate) Then
+      Call DisplayError(1, lang(cnnDB, "DueDate"))
+    End If
+
     if (status=Cfg(cnnDB, "CloseStatus")) and (Len(solution)=0) Then
       Call DisplayError(1, Lang(cnnDB, "Solution"))
     End if
+    
   ' Clean up fields
     uemail = Left(Trim(uemail), 50)
     uemail = Replace(uemail, "'", "''")
@@ -114,10 +125,22 @@
       time_spent = 0
     End If
 
+    If (Len(notes) > 0 And Request.Form("hidenotes") <> "on") Or (status=Cfg(cnnDB, "CloseStatus")) Then
+      blnFirstResponse = True
+    Else
+      blnFirstResponse = False
+    End If
+
+    If (Len(notes) > 0) And (sid <> rep) And (rep = oldrep) Then
+      blnNotifyRep = True
+    Else
+      blnNotifyRep = False
+    End If
+
 
   ' Grab original description
     Dim rstDesc, strChangeNotes
-    Set rstDesc = SQLQuery(cnnDB, "SELECT category, department, rep, status, priority FROM problems WHERE id=" & id)
+    Set rstDesc = SQLQuery(cnnDB, "SELECT category, department, rep, status, priority, first_response FROM problems WHERE id=" & id)
 
   ' Insert actions into strChangeNotes
     If (category <> rstDesc("category")) OR (department <> rstDesc("department")) OR _
@@ -232,18 +255,31 @@
       "status=" & status & ", " & _
       "rep=" & rep & ", " & _
       "kb=" & kb & ", " & _
+      "due_date=" & SQLDate(duedate, lhdAddSQLDelim) & ", " & _
       "time_spent=" & time_spent & ", " & _
       "solution='" & solution & "'"
 
     ' Add the closed date/time if the problem is closed
     If status = Cfg(cnnDB, "CloseStatus") Then
       probStr = probStr & ", close_date=" & SQLDate(Now, lhdAddSQLDelim)
+	  If (Request.Form("noemail")<>"on") Then
+	    'Set email send field to true
+		probStr = probStr & ", emailsent=1"
+	  End If
     End If
     strUpdateMessage = Lang(cnnDB, "Theproblemhasbeensaved") & "."
 
     probStr = probStr & " WHERE id=" & id
 
     Set probRes = SQLQuery(cnnDB, probStr)
+
+    If blnFirstResponse And Not IsDate(rstDesc("first_response")) Then
+      Dim firstResponseRes
+      Set firstResponseRes = SQLQuery(cnnDB, "UPDATE problems SET first_response=" & SQLDate(Now, lhdAddSQLDelim) & " WHERE id = " & id)
+      Set firstResponseRes = Nothing
+    End If
+    rstDesc.Close
+    Set rstDesc = Nothing
 
     If status = Cfg(cnnDB, "CloseStatus") Then
       If Not (Request.Form("noemail")="on") Then
@@ -255,6 +291,11 @@
       ' Notify user of update
       If (Cfg(cnnDB, "Notifyuser") = 1) And Not (Request.Form("noemail")="on") And blnSendUpdateMsg Then
         Call eMessage(cnnDB, "userupdate", id, uemail)
+      End If
+
+      'Notify rep if problem updated by another rep
+      If blnNotifyRep Then
+        Call eMessage(cnnDB, "repupdate", id, Usr(cnnDB, rep, "email1"))
       End If
 
       'Send mail to the appropriate rep for transfered problems
@@ -282,9 +323,11 @@
     Dim rstOpenOldStat, rstOpenNewStat, rstOpenUserEmail
 
     strSQLOpen = "UPDATE problems SET " & _
-      "rep = " & sid & ", " & _
       "status = " & Cfg(cnnDB, "DefaultStatus") & ", " & _
       "close_date = NULL"
+	If Usr(cnnDB, sid, "IsRep")=1 Then  ' If rep, then reassign
+	  strSQLOpen = strSQLOpen & ", rep = " & sid 
+	End If
     strSQLOpen = strSQLOpen & " WHERE id = " & id
     Set rstOpenProbUpd = SQLQuery(cnnDB, strSQLOpen)
     Set rstOpenNewStat = SQLQuery(cnnDB, "SELECT sname FROM status WHERE status_id=" & Cfg(cnnDB, "DefaultStatus"))
@@ -299,6 +342,17 @@
     rstOpenUserEmail.Close
     rstOpenNewStat.Close
     rstOpenOldStat.Close
+	
+	' If not a support rep, redirect to the user details page
+	If Usr(cnnDB, sid, "IsRep")=0 Then
+	  Dim repRes, queryStr
+	  queryStr = "SELECT r.email1 FROM (problems As p INNER JOIN tblUsers As r On r.sid = p.rep) WHERE p.id = " & id
+	  Set repRes = SQLQuery(cnnDB, queryStr)
+	  Call eMessage(cnnDB, "repupdate", id, repRes("email1"))
+	  repRes.Close
+	  Response.Clear()
+	  Response.Redirect("../user/details.asp?id=" & id)
+	End if
 
   End If
 
@@ -307,7 +361,7 @@
 	' Query the database for the problem info
   Dim rstProb, rstSol, rstNotes, entered_by, strProbQuery
   strProbQuery = "SELECT uid, uemail, uphone, ulocation, time_spent, department, " & _
-		"category, status, priority, entered_by, rep, kb, start_date, close_date, title, description " & _
+		"category, status, priority, entered_by, rep, kb, start_date, due_date, close_date, title, description " & _
 		"FROM problems WHERE id=" & id
 
   ' Make sure rep is viewing own problems.
@@ -339,6 +393,7 @@
   entered_by = Cint(rstProb("entered_by"))
 	start_date = rstProb("start_date")
 	close_date = rstProb("close_date")
+  duedate = rstProb("due_date")
 	title = rstProb("title")
 	description = rstProb("description")
 
@@ -485,7 +540,7 @@
           <SELECT NAME="category" <% = strListDisable %>>
           <%
             Dim rstCat
-            Set rstCat = SQLQuery(cnnDB, "SELECT * From categories WHERE category_id > 0 ORDER BY category_id ASC")
+            Set rstCat = SQLQuery(cnnDB, "SELECT * From categories WHERE category_id > 0 ORDER BY cname ASC")
             If Not rstCat.EOF Then
             Do While Not rstCat.EOF
             If rstCat("category_id") = category Then
@@ -509,7 +564,7 @@
           <b><%=lang(cnnDB, "Status")%>:</b>
         </td>
         <td>
-          <SELECT NAME="status" <% = strListDisable %>>
+          <SELECT NAME="status" id="selStatus" <% = strListDisable %>>
           <%
             Dim rstStat
             Set rstStat = SQLQuery(cnnDB, "SELECT * From status WHERE status_id > 0 ORDER BY status_id ASC")
@@ -583,6 +638,14 @@
             End If
           %>
           </SELECT><em>*</em>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <b><%=lang(cnnDB, "DueDate")%>:</b>
+        </td>
+        <td>
+          <input type="text" name="duedate" size="10" maxlength="12" value="<% = DisplayDate(duedate, lhdDateOnly) %>" <% = strTextDisable %>><em>*</em>&nbsp;<font size="-2">(<% = Usr(cnnDB, sid, "dateformat") %>)</font>
         </td>
       </tr>
       <tr>
@@ -694,7 +757,7 @@
      Response.Write("<tr class=""Head2"" align=""center""><td colspan=""2"">")
      If Cfg(cnnDB, "EmailType") <> 0 Then
 %>
-      <input type="checkbox" name="noemail" <% = strListDisable %>>&nbsp;<%=lang(cnnDB, "Dontsendemailtouser")%>
+      <input type="checkbox" name="noemail" id="noEmailCheck"><label id="noEmailSend" for="noEmailCheck"><%=lang(cnnDB, "Dontsendemailtouser")%></label>
       <p>
     <% End If %>
       <input type="submit" value="<%=lang(cnnDB, "SaveProblem")%>" name="B1">

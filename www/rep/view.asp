@@ -166,7 +166,7 @@
 	If Len(Request.QueryString("num")) > 0 Then
 		numToDisplay = CInt(Request.QueryString("num"))
 	Else
-		numToDisplay = 10
+		numToDisplay = 25
 	End if
 	If Len(Request.QueryString("start")) > 0 Then
 		start = CInt(Request.QueryString("start"))
@@ -261,10 +261,10 @@
     Else
   %>
   <div align="center">
-  <table border="0" cellspacing="3" cellpadding="5" width="600">
+  <table Class="Wide">
   <tr class="Head1">
     <td colspan="6" valign="center">
-      <font size="+2"><b><%=lang(cnnDB, "OpenProblemsfor")%>&nbsp;<% = ruid %></b></font>
+      <font size="+2"><b><%=lang(cnnDB, "Problemsfor")%>&nbsp;<% = ruid %></b></font>
     </td>
   </tr>
   <tr align="center" Class="Head2">

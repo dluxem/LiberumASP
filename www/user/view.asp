@@ -47,7 +47,7 @@
       ' the URL entered.  If none exists then get the
       ' top fifty problem entered.
       Dim listStr, rstProbList
-      listStr = "SELECT TOP 50 p.id, p.title, p.start_date, r.fname, r.email1 As remail, s.sname " & _
+      listStr = "SELECT p.id, p.title, p.start_date, r.fname, r.email1 As remail, s.sname " & _
       "FROM (problems AS p " & _
       "INNER JOIN tblUsers AS r ON p.rep = r.sid) " & _
       "INNER JOIN status AS s ON p.status = s.status_id "
@@ -140,7 +140,7 @@
       If Len(Request.QueryString("num")) > 0 Then
         numToDisplay = CInt(Request.QueryString("num"))
       Else
-        numToDisplay = 10
+        numToDisplay = 25
       End if
       If Len(Request.QueryString("start")) > 0 Then
         start = CInt(Request.QueryString("start"))
@@ -197,11 +197,11 @@
                 %>
                 <div align="center">
                   <% If start > 1 Then %>
-                    <A HREF="view.asp?start=<% = startP %>&num=<% = numToDisplay %>&sort=<% = intSort %>&order=<% = intOrder %>"><%=lang(cnnDB, "Previous")%></A>&nbsp;
+                    <A class="HeadLink" HREF="view.asp?start=<% = startP %>&num=<% = numToDisplay %>&sort=<% = intSort %>&order=<% = intOrder %>"><%=lang(cnnDB, "Previous")%></A>&nbsp;
                   <% End If
                     If Not (rstProbList.EOF) Then
                   %>
-                    <A HREF="view.asp?start=<% = startN %>&num=<% = numToDisplay %>&sort=<% = intSort %>&order=<% = intOrder %>"><%=lang(cnnDB, "Next")%></A>
+                    <A class="HeadLink" HREF="view.asp?start=<% = startN %>&num=<% = numToDisplay %>&sort=<% = intSort %>&order=<% = intOrder %>"><%=lang(cnnDB, "Next")%></A>
                   <% End If %>
                 </div>
               </td>

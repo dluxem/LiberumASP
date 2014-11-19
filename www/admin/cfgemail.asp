@@ -14,7 +14,7 @@
   Liberum Help Desk comes with ABSOLUTELY NO WARRANTY
   Please view the license.html file for the full GNU General Public License.
 
-  Filename: cfgemail.asp
+  Filename: cfgemailhtml.asp
   Date:     $Date: 2001/12/09 02:01:24 $
   Version:  $Revision: 1.50 $
   Purpose:  Form to configure the email messages sent to users and reps.
@@ -52,14 +52,15 @@
       ' Save Results
       If Request.Form("save") = "1" Then
         Dim strSQL, updRes
-        Dim Subject, Body
+        Dim Subject, Body, BodyHTML
 
         Subject = Left(Trim(Request.Form("subject")), 50)
         Body = Trim(Request.Form("body"))
-
+		BodyHTML = Trim(Request.Form("bodyhtml"))
 
         strSQL = "UPDATE tblEmailMsg SET " & _
           "subject = '" & Subject & "', " & _
+          "bodyhtml = '" & BodyHTML & "', " & _
           "body = '" & Body & "' " & _
           "WHERE type='" & eType & "'"
 
@@ -70,7 +71,7 @@
       If Not displayMenu Then
         Dim cfgRes
         ' Get current configuration
-        Set cfgRes = SQLQuery(cnnDB, "Select Subject, Body From tblEmailMsg WHERE type='" & eType & "'")
+        Set cfgRes = SQLQuery(cnnDB, "Select Subject, Body, bodyhtml From tblEmailMsg WHERE type='" & eType & "'")
 
         If cfgRes.EOF Then
           Call DisplayError(3, lang(cnnDB, "Unable to read message from the database") & ".")
@@ -141,7 +142,11 @@
                 </table>
                 <b><%=lang(cnnDB, "Body")%>:</b><br>
                 <div align="center">
+					<b>Plain Text</b><br>
                   <textarea rows="8" cols="80" name="body"><% = cfgRes("body") %></textarea>
+                  <p>
+				  <b>HTML</b><br>
+				  <textarea rows="8" cols="80" name="bodyhtml"><% = cfgRes("bodyhtml") %></textarea>
                   <p>
                   <a href="cfgemail_help.asp" target="#"><%=lang(cnnDB, "SyntaxHelp")%></a>
                   <p>

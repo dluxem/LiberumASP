@@ -40,7 +40,7 @@
 
       ' Get the information from the form fields
       Dim uid, uemail, uphone, ulocation, category, department, title, description, entered_by
-      Dim kb
+      Dim kb, duedate, priority
       
       uid = Request.Form("uid")
       uemail = Request.Form("uemail")
@@ -52,6 +52,8 @@
       description = Request.Form("description")
       entered_by = sid
       kb = 0
+      duedate = ConvertFormattedDate(Request.Form("duedate"))
+      priority = Cint(Request.Form("priority"))
 
     ' Check for required fields (uemail, category, department, title, description)
 
@@ -70,12 +72,21 @@
         Call DisplayError(1, lang(cnnDB, "Department"))
       End if
 
+      if priority = 0 Then
+        cnnDB.Close
+        Call DisplayError(1, lang(cnnDB, "Priority"))
+      end if
+
+      If Not IsDate(duedate) Then
+        Call DisplayError(1, lang(cnnDB, "DueDate"))
+      End If
+
       if Len(title)=0 Then
         cnnDB.Close
         Call DisplayError(1, lang(cnnDB, "Title"))
-      Elseif Len(title) > 50 Then
+      Elseif Len(title) > 255 Then
         title = Trim(title)
-        title = Left(title, 50)
+        title = Left(title, 255)
       End if
 
       if Len(description)=0 Then
@@ -84,11 +95,10 @@
       End if
 
     ' Get missing variables to enter problem
-      Dim id, priority, status, start_date, rep, time_spent
-      priority = Cfg(cnnDB, "DefaultPriority")
+      Dim id, status, start_date, rep, time_spent
       status = Cfg(cnnDB, "DefaultStatus")
       time_spent = 0
-      start_date = SQLDate(Now, lhdAddSQLDelim)
+      start_date = Now
 
       ' Get the department name by querying on department_id
       Dim dname, rstDept
@@ -100,6 +110,12 @@
       Set catRes = SQLQuery(cnnDB, "SELECT cname, rep_id FROM categories WHERE category_id=" & Request.Form("category"))
       rep = catRes("rep_id")
       cname = catRes("cname")
+
+      ' Get the priority name
+      Dim pname, priRes
+      Set priRes = SQLQuery(cnnDB, "SELECT pname FROM priority WHERE priority_id=" & priority)
+      pname = priRes("pname")
+      priRes.Close
 
     ' Get the problem ID number then immediately update it
       id = GetUnique(cnnDB, "problems")
@@ -118,10 +134,10 @@
     ' Write problem into database
       Dim strProblemQry, rstProbInsert
       strProblemQry = "INSERT INTO problems (id, uid, uemail, uphone, ulocation, entered_by, " & _
-        "category, department, title, description, priority, status, start_date, rep, time_spent, kb) " & _
+        "category, department, title, description, priority, status, start_date, due_date, rep, time_spent, kb) " & _
         "VALUES (" & id & ",'" & uid & "','" & uemail & "','" & uphone & "','" & _
         ulocation & "'," & entered_by & "," & category & "," & department & ",'" & title & "','" & _
-        description & "'," & priority & "," & status & "," & start_date & "," & rep & "," & time_spent & _
+        description & "'," & priority & "," & status & "," & SQLDate(start_date, lhdAddSQLDelim) & "," & SQLDate(duedate, lhdAddSQLDelim) & "," & rep & "," & time_spent & _
         "," & kb & ")"
 
       Set rstProbInsert = SQLQuery(cnnDB, strProblemQry)
@@ -196,7 +212,15 @@
                   <b><%=lang(cnnDB, "StartDate")%>:</b>
                 </td>
                 <td>
-                  <% = start_date %>
+                  <% = DisplayDate(start_date,lhdDateTime) %>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <b><%=lang(cnnDB, "DueDate")%>:</b>
+                </td>
+                <td>
+                  <% = DisplayDate(duedate,lhdDateOnly) %>
                 </td>
               </tr>
               <tr>
@@ -213,6 +237,14 @@
                 </td>
                 <td>
                   <% = catRes("cname") %>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <b><%=lang(cnnDB, "Priority")%>:</b>
+                </td>
+                <td>
+                  <% = pname %>
                 </td>
               </tr>
               <tr>

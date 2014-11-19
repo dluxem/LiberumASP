@@ -242,6 +242,22 @@
           <%=lang(cnnDB, "baseurlHelp")%>
         </td>
       </tr>
+      <tr class="Body1">
+        <td>
+          u_title
+        </td>
+        <td>
+          URL Encoded version of the title.
+        </td>
+      </tr>
+	        <tr class="Body1">
+        <td>
+          u_rfname
+        </td>
+        <td>
+          URL Encoded version of the support representative's full name.
+        </td>
+      </tr>
     </table>
     <p>
     <form>
