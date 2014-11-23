@@ -61,7 +61,7 @@
     Dim oldrep, blnFirstResponse
 
     ' Get the problem data from the form fields.
-    id = Request.Form("id")
+    id = Cint(Request.Form("id"))
     uid = Request.Form("uid")
     uemail = Request.Form("uemail")
     uphone = Request.Form("uphone")
