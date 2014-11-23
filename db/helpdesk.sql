@@ -76,13 +76,17 @@ CREATE TABLE [dbo].[problems] (
 	[category] [int] NULL ,
 	[priority] [int] NULL ,
 	[department] [int] NULL ,
-	[title] [varchar] (50) NULL ,
+	[title] [varchar] (255) NULL ,
 	[description] [text] NULL ,
 	[solution] [text] NULL ,
 	[start_date] [datetime] NULL ,
 	[close_date] [datetime] NULL ,
+	[due_date] [datetime] NULL ,
+	[first_response] [datetime] NULL ,
 	[entered_by] [int] NULL ,
-	[kb] [int] NULL 
+	[kb] [int] NULL ,
+	[emailsent] BIT NULL ,
+	[kb_inserted] INT NULL
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
 
@@ -133,7 +137,8 @@ GO
 CREATE TABLE [dbo].[tblEmailMsg] (
 	[type] [varchar] (50) NOT NULL ,
 	[subject] [varchar] (50) NULL ,
-	[body] [text] NULL 
+	[body] [text] NULL ,
+	[bodyhtml] [text] NULL 
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
 
@@ -177,6 +182,7 @@ CREATE TABLE [dbo].[tblUsers] (
 	[ListOnInoutBoard] [int] NOT NULL ,
 	[firstname] [varchar] (50) NULL ,
 	[lastname] [varchar] (50) NULL ,
+	[dateformat] [varchar] (12) NOT NULL ,
 	[inoutadmin] [int] NOT NULL ,
 	[phone_home] [varchar] (50) NULL ,
 	[phone_mobile] [varchar] (50) NULL ,
@@ -274,7 +280,7 @@ INSERT INTO tblconfig
   (
     'Company Name', 'http://www.company.com/helpdesk', 'admin', 1, 'smtp.company.com',
     'Consultant', 'helpdesk@company.com', '@company.com', 0, 0, 2, 1, 1, 100, 2,
-    '0.97', 1, 0, 0, 1, 0, 100000
+    '0.98', 1, 0, 0, 1, 0, 100000
   )
 GO
 
@@ -412,8 +418,8 @@ INSERT INTO tblEmailMsg(type, subject, body)
   )
 GO
 
-INSERT INTO tblUsers(sid, uid, fname, email1)
-  VALUES (0, 'unknown', 'Unknown', 'none@localhost')
+INSERT INTO tblUsers(sid, uid, fname, email1, dateformat)
+  VALUES (0, 'unknown', 'Unknown', 'none@localhost', 'yyyy-mm-dd')
 GO
 
 INSERT INTO db_keys(problems, departments, categories, users, Lang)

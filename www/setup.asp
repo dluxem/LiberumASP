@@ -44,7 +44,7 @@
       ' -------------------------------------
       ' Enter the latest version number below
       ' -------------------------------------
-      strNewVersion = "0.97"
+      strNewVersion = "0.98"
       
       Dim strLangDir
       strLangDir = "lang\"
@@ -275,6 +275,34 @@
           UpdateDB("UPDATE tblConfig SET Version = '0.97'")           
           strCurVersion = "0.97"
         End If
+		
+        ' ------------------------------
+        ' Update from 0.97 to 0.99
+        ' ------------------------------
+        If strCurVersion = "0.97" Then
+        
+          ' Update Problem TABLE
+          UpdateDB("ALTER TABLE problems " & _
+            "ADD [due_date] datetime NULL , " & _
+            "[emailsent] BIT NULL , " & _
+            "[lastname] varchar (50) NULL, " & _
+            "[kb_inserted] int NULL")
+          
+          ' Extend problems.title to 255 characters
+          UpdateDB("ALTER TABLE problems ALTER COLUMN title varchar (255)")
+          
+          ' Add html email support
+          UpdateDB("ALTER TABLE tblEmailMsg ADD [bodyhtml] text NULL")
+          
+          ' Add user datetime display format, default yyyy-mm-dd
+          UpdateDB("ALTER TABLE tblUsers ADD [dateformat] varchar (12) NOT NULL DEFAULT 'yyyy-mm-dd'")
+          
+          ' Update version field
+          UpdateDB("UPDATE tblConfig SET Version = '0.97'")           
+          strCurVersion = "0.97"
+        End If
+        
+		End If
 
         ' Language Updates (keep last)
         Call UpdateAllLanguages
