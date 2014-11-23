@@ -452,7 +452,7 @@
       Sub PrintLangForm
         Response.Write("<b>Select languages to install:</b><br>")
         ' Four languages per line
-        Response.Write("English:<input type=""checkbox"" name=""english"" checked> | ")
+        Response.Write("English:<input type=""checkbox"" name=""english""> | ")
         Response.Write("Danish:<input type=""checkbox"" name=""danish""> | ")
         Response.Write("Dutch:<input type=""checkbox"" name=""dutch"">")
         Response.Write("<br />")
@@ -487,7 +487,10 @@
                 <b>Description:</b> <% = strErrorDesc %>
             <% Elseif blnUpdate or blnUpdateLang Then %>
                 <b>Successfully Updated!</b><p>
-                Your database has been successfully update to version <% = strNewVersion %>.  You should
+                Your database has been successfully update to version <% = strNewVersion %>.
+                <p><a href="setup.asp">Install/Upgrade Language Strings</a>
+                <p>
+                If you are done installing languages, you should
                 now remove setup.asp from your web server to prevent unauthorized attempts to manipulate
                 your database.
                 <p>
