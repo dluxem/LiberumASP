@@ -635,6 +635,105 @@ End If
 
 End Sub
 
+' SendMailHTML:
+' Sends mail using the supported system set in global.asa
+Sub SendMailHTML (strToAddr, strFromAddr, strFromName, strSubject, strBody, strHTML, cnnDB)
+
+	Dim Mail
+
+	If Not Application("Debug") Then
+		On Error Resume Next
+	End If
+
+	Select Case Cfg(cnnDB, "EmailType")
+	Case 0	'No Email
+
+	Case 1	'CDONTS
+		Set Mail = Server.CreateObject("CDONTS.NewMail")
+		Mail.BodyFormat = 1	' Text Only, 0 for HTML
+		Mail.Subject = strSubject
+		Mail.To = strToAddr
+		Mail.Body = strBody
+		Mail.Send(strFromName & "<" & strFromAddr & ">")
+		Set Mail = Nothing
+
+	Case 2	'Jmail
+		On Error Resume Next ' Use Jmail logging
+		Set Mail = Server.CreateObject("Jmail.Message")
+		Mail.Logging = True
+		Mail.From = strFromAddr
+		Mail.FromName = strFromName
+		Mail.AddRecipient strToAddr
+		Mail.Subject = strSubject
+		Mail.Body = strBody
+		If Not Mail.Send(Cfg(cnnDB, "SMTPServer")) Then
+			If Application("Debug") Then
+				Call DisplayError(3, Mail.Log)
+			End If
+		End If
+		Set Mail = Nothing
+
+	Case 3	'ASPEmail
+		Set Mail = Server.CreateObject("Persits.MailSender")
+		Mail.Host = Cfg(cnnDB, "SMTPServer")
+		Mail.From = strFromAddr
+		Mail.FromName = strFromName
+		Mail.AddAddress strToAddr
+		Mail.Subject = strSubject
+		Mail.Body = strBody
+		Mail.Send
+		Set Mail = Nothing
+
+	Case 4  ' ASPMail
+		Set Mail = Server.CreateObject("SMTPsvg.Mailer")
+		Mail.FromName = strFromName
+		Mail.FromAddress = strFromAddr
+		Mail.RemoteHost = Cfg(cnnDB, "SMTPServer")
+		Mail.AddRecipient "Help Desk User", strToAddr
+		Mail.Subject = strSubject
+		Mail.BodyText = strBody
+		Mail.SendMail
+	Case 5  ' CDOSYS
+		DIM strIncomingMailServer, objCDOSYSMail, objCDOSYSCon
+		'Create the e-mail server object
+		strIncomingMailServer = Cfg(cnnDB, "SMTPServer")
+		Set objCDOSYSMail = Server.CreateObject("CDO.Message")
+		Set objCDOSYSCon = Server.CreateObject ("CDO.Configuration")
+
+		'Set and update fields properties
+		With objCDOSYSCon
+			'Out going SMTP server
+			.Fields("http://schemas.microsoft.com/cdo/configuration/smtpserver") = strIncomingMailServer
+			'SMTP port
+			.Fields("http://schemas.microsoft.com/cdo/configuration/smtpserverport")  = 25
+			'CDO Port
+			.Fields("http://schemas.microsoft.com/cdo/configuration/sendusing") = 2
+			'.Timeout
+			.Fields("http://schemas.microsoft.com/cdo/configuration/smtpconnectiontimeout") = 60
+			.Fields.Update
+		End With
+   'Update the CDOSYS Configuration 
+		Set objCDOSYSMail.Configuration = objCDOSYSCon
+			With objCDOSYSMail
+				.From = """" & strFromName & """ <" & strFromAddr & ">"
+				'.From = Cfg(cnnDB, "HDName") & " <" & Cfg(cnnDB, "HDReply") & ">"
+				.To = strToAddr
+				.Subject = strSubject
+				'.HTMLBody = strHTML 'Set the e-mail body format (HTMLBody=HTML TextBody=Plain)
+				.TextBody = strBody
+				'Send the e-mail
+				If NOT strIncomingMailServer = "" Then .Send
+			End with
+			'Close the server mail object
+		Set objCDOSYSMail = Nothing 
+	End Select
+
+	If Err.Number <> 0 Then
+		Call TrapError(Err.Number, Err.Description, Err.Source)
+	End If
+
+End Sub
+
 
 ' Message:
 ' Parses and sends an email
