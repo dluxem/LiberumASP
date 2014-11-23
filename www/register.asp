@@ -69,6 +69,7 @@
       lastname = Left(Trim(Replace(Request.Form("lastname"), "'", "''")), 24)
       fname = firstname & " " & lastname
       dateformat = Left(Trim(Lcase(Request.Form("dateformat"))), 12)
+      dateformat = Replace(dateformat, "'", "''")
       if cfg(cnnDB,"useinoutboard") = 1 then
         phone_home = Left(Trim(Replace(Request.Form("phone_home"), "'", "''")), 50)
         phone_mobile = Left(Trim(Replace(Request.Form("phone_mobile"), "'", "''")), 50)

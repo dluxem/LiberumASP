@@ -54,15 +54,15 @@
 
       Dim id
       If Len(Request.QueryString("id")) > 0 Then
-        id = Request.QueryString("id")
+        id = CInt(Request.QueryString("id"))
       Else
-        id = Request.Form("id")
+        id = CInt(Request.Form("id"))
       End If
 
       id = Trim(id)
 
       If IsNumeric(id) Then
-        listStr = listStr & "WHERE p.uid='" & uid & "' AND p.id=" & Cint(id)
+        listStr = listStr & "WHERE p.uid='" & uid & "' AND p.id=" & id
       Else
         listStr = listStr & "WHERE p.uid='" & uid & "'"
       End If

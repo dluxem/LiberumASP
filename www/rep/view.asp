@@ -68,7 +68,7 @@
 
 	' If a problem ID is entered, search only for that
 	If Len(Request.QueryString("id"))>0 Then
-		listStr = listStr & " p.id=" & Request.QueryString("id")
+		listStr = listStr & " p.id=" & Cint(Request.QueryString("id"))
 		disp_total = FALSE
 	Else
 		listStr = listStr & " p.status<>" & Cfg(cnnDB, "CloseStatus") & " AND p.rep=" & rep_id
