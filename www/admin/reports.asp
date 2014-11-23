@@ -82,7 +82,7 @@
                 Next
                 Response.Write ("</select> / <select name=""s_year"" size=""1"">")
                 year_adj = Year(now) + year_adj
-                For count = 2000 to 2010
+                For count = 2000 to Year(now)
                   If count = year_adj Then
                     Response.Write("<option value=""" & count & """ selected>" & count & "</option>")
                   Else
@@ -108,7 +108,7 @@
                   End If
                 Next
                 Response.Write ("</select> / <select name=""e_year"" size=""1"">")
-                For count = 2000 to 2010
+                For count = 2000 to Year(now)
                   If count = Year(now) Then
                     Response.Write("<option value=""" & count & """ selected>" & count & "</option>")
                   Else

@@ -361,20 +361,20 @@ Sub DisplayFooter(cnnDB, sid)
 	If (Not userChkRes.EOF) AND (sid <> 0) Then
     Response.Write("<p><div align=""center"">")
     If Usr(cnnDB, sid, "IsRep") > 0 Then
-      Response.Write "<a href=""/user"">" & lang(cnnDB, "UserMenu") & "</a> | " & _
-        "<a href=""/rep"">" & lang(cnnDB, "RepMenu") & "</a> | "
+      Response.Write "<a href=""" & Cfg(cnnDB, "BaseURL") & "/user"">" & lang(cnnDB, "UserMenu") & "</a> | " & _
+        "<a href=""" & Cfg(cnnDB, "BaseURL") & "/rep"">" & lang(cnnDB, "RepMenu") & "</a> | "
     Else
-      Response.Write("<a href=""/user"">" & lang(cnnDB, "Menu") & "</a> | ")
+      Response.Write("<a href=""" & Cfg(cnnDB, "BaseURL") & "/user"">" & lang(cnnDB, "Menu") & "</a> | ")
     End If
     If Cfg(cnnDB, "UseInoutBoard") = 1 Then
-      Response.Write("<a href=""/inout/default.asp"">" & lang(cnnDB, "InOutBoard") & "</a> | ")
+      Response.Write("<a href=""" & Cfg(cnnDB, "BaseURL") & "/inout/default.asp"">" & lang(cnnDB, "InOutBoard") & "</a> | ")
     End If
-		Response.Write "<a href=""/logoff.asp"">" & lang(cnnDB, "LogOff") & "</a>" & _
+		Response.Write "<a href=""" & Cfg(cnnDB, "BaseURL") & "/logoff.asp"">" & lang(cnnDB, "LogOff") & "</a>" & _
 		  "</div></p>"
 	End If
 	Response.Write"<p><hr width=""500"">" & vbNewLine & _
 	  "<div align=""center""><font size=""-1"">" & _
-	  "<a href=""http://www.liberum.org"">" & lang(cnnDB, "LiberumHelpDesk") & "</a>, " & lang(cnnDB, "Copyright") & ". " & lang(cnnDB, "Pleaseviewthe") & " <a href=""/license.html"">" & lang(cnnDB, "license") & "</a>." & _
+	  "<a href=""http://www.liberum.org"">" & lang(cnnDB, "LiberumHelpDesk") & "</a>, " & lang(cnnDB, "Copyright") & ". " & lang(cnnDB, "Pleaseviewthe") & " <a href=""" & Cfg(cnnDB, "BaseURL") & "/license.html"">" & lang(cnnDB, "license") & "</a>." & _
 	  "</font></div></p>"
 	userChkRes.Close
 End Sub
@@ -448,8 +448,7 @@ Sub CheckUser(cnnDB, sid)
 	If (userchkRes.EOF) OR (sid = 0) Then
 		Dim reAddr
 
-		' Cfg(cnnDB, "BaseURL") &
-		reAddr = "/logon.asp?URL=" & _
+		reAddr = Cfg(cnnDB, "BaseURL") & "/logon.asp?URL=" & _
 			Request.ServerVariables("PATH_INFO")
 		If Len(Request.ServerVariables("QUERY_STRING")) > 0 Then
 			reAddr = reAddr & _
@@ -872,7 +871,7 @@ Function SQLDate (dtDate, intUseDelim)
     SQLDate = Year(dtDate) & "-" & Month(dtDate) & "-" & Day(dtDate)
     SQLDate = SQLDate & " " & Hour(dtDate) & ":" & Minute(dtDate) & ":" & Second(dtDate)
     Dim strDeLim
-    If Application("DBType") = 1 Or Application("DBType") = 2 Then
+    If Application("DBType") = 1 Or Application("DBType") = 2 Or Application("DBType") = 4 Then
       strDeLim = "'"
     Else
       strDeLim = "#"
