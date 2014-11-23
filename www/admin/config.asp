@@ -135,7 +135,7 @@
           <tr>
             <td>
               <table class="Normal">
-                <tr class="body1">
+                <tr class="Body1">
                   <td width="120">
                     <b><%=lang(cnnDB, "SiteName")%>:</b>
                   </td>
@@ -143,7 +143,7 @@
                     <input type="text" size="30" name="sitename" value="<% = rstConfig("SiteName") %>">
                   </td>
                 </tr>
-                <tr class="body2">
+                <tr class="Body2">
                   <td>
                     <b><%=lang(cnnDB, "BaseURL")%>:</b>
                   </td>
@@ -152,7 +152,7 @@
                     <font size="-2"><i>(http://intranet/helpdesk)</i></font>
                   </td>
                 </tr>
-                <tr class="body1">
+                <tr class="Body1">
                   <td>
                     <b><%=lang(cnnDB, "AdministratorsName")%>:</b>
                   </td>
@@ -160,7 +160,7 @@
                     <input type="text" size="30" name="hdname" value="<% = rstConfig("HDName") %>">
                   </td>
                 </tr>
-                <tr class="body2">
+                <tr class="Body2">
                   <td>
                     <b><%=lang(cnnDB, "AdministratorsEmail")%>:</b>
                   </td>
@@ -168,7 +168,7 @@
                     <input type="text" size="30" name="hdreply" value="<% = rstConfig("HDReply") %>">
                   </td>
                 </tr>
-                <tr class="body1">
+                <tr class="Body1">
                   <td>
                     <b><%=lang(cnnDB, "BaseEmail")%>:</b>
                   </td>
@@ -177,7 +177,7 @@
                     <font size="-2"><i>(@company.com)</i></font>
                   </td>
                 </tr>
-                <tr class="body2">
+                <tr class="Body2">
                   <td>
                     <b><%=lang(cnnDB, "EmailType")%>:</b>
                   </td>
@@ -206,7 +206,7 @@
                     </select>
                   </td>
                 </tr>
-                <tr class="body1">
+                <tr class="Body1">
                   <td>
                     <b><%=lang(cnnDB, "SMTPServer")%>:</b>
                   </td>
@@ -215,7 +215,7 @@
                     <font size="-2"><i>(<%=lang(cnnDB, "JMailorASPEmail")%>)</i></font>
                   </td>
                 </tr>
-                <tr class="body2">
+                <tr class="Body2">
                   <td>
                     <b><%=lang(cnnDB, "PagerPriorityLevel")%>:</b>
                   </td>
@@ -248,7 +248,7 @@
                     </select>
                   </td>
                 </tr>
-                <tr class="body1">
+                <tr class="Body1">
                   <td>
                     <b><%=lang(cnnDB, "EmailUseronUpdate")%>:</b>
                   </td>
@@ -264,7 +264,7 @@
                     </select>
                   </td>
                 </tr>
-                <tr class="body2">
+                <tr class="Body2">
                   <td>
                     <b><%=lang(cnnDB, "EnableUserKB")%>:</b>
                   </td>
@@ -295,7 +295,7 @@
                     </select>
                   </td>
                 </tr>
-                <tr class="body1">
+                <tr class="Body1">
                   <td>
                     <b><%=lang(cnnDB, "KBSQLFreeTextSearches")%>:</b>
                   </td>
@@ -311,7 +311,7 @@
                     </select>
                   </td>
                 </tr>
-                <tr class="body2">
+                <tr class="Body2">
                   <td>
                     <b><%=lang(cnnDB, "DefaultPriority")%>:</b>
                   </td>
@@ -339,7 +339,7 @@
                     </select>
                   </td>
                 </tr>
-                <tr class="body1">
+                <tr class="Body1">
                   <td>
                     <b><%=lang(cnnDB, "DefaultStatus")%>:</b>
                   </td>
@@ -367,7 +367,7 @@
                     </select>
                   </td>
                 </tr>
-                <tr class="body2">
+                <tr class="Body2">
                   <td>
                     <b><%=lang(cnnDB, "CloseStatus")%>:</b>
                   </td>
@@ -395,7 +395,7 @@
                     </select>
                   </td>
                 </tr>
-                <tr class="body1">
+                <tr class="Body1">
                   <td>
                     <b><%=lang(cnnDB, "AuthenticationType")%>:</b>
                   </td>
@@ -423,7 +423,7 @@
                     </select>
                   </td>
                 </tr>
-                <tr class="body2">
+                <tr class="Body2">
                   <td>
                     <b><%=lang(cnnDB, "UseSelectUser")%>:</b>
                   </td>
@@ -439,7 +439,7 @@
                     </select>
                   </td>
                 </tr>
-                <tr class="body1">
+                <tr class="Body1">
                   <td>
                     <b><%=lang(cnnDB, "UseInOutBoard")%>:</b>
                   </td>
@@ -455,7 +455,7 @@
                     </select>
                   </td>
                 </tr>
-                <tr class="body2">
+                <tr class="Body2">
                   <td>
                     <b><%=lang(cnnDB, "AllowImageUpload")%>:</b>
                   </td>
@@ -471,7 +471,7 @@
                     </select>
                   </td>
                 </tr>
-                <tr class="body1">
+                <tr class="Body1">
                   <td>
                     <b><%=lang(cnnDB, "MaxImageSize")%>:</b>
                   </td>
@@ -479,7 +479,7 @@
                     <input type="text" size="30" name="MaxImageSize" value="<% = rstConfig("MaxImageSize") %>">
                   </td>
                 </tr>
-                <tr class="body2">
+                <tr class="Body2">
                   <td>
                     <b><%=lang(cnnDB, "Defaultlanguage")%>:</b>
                   </td>
