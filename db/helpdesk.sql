@@ -302,6 +302,8 @@ INSERT INTO tblConfig_Email (ID, Type)
   VALUES (3, 'ASPEmail')
 INSERT INTO tblConfig_Email (ID, Type)
   VALUES (4, 'ASPMail')
+INSERT INTO tblConfig_Email (ID, Type)
+  VALUES (5, 'CDOSYS (Recommended)')  
 GO
 
 INSERT INTO tblEmailMsg(type, subject, body)

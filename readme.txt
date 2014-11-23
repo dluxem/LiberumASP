@@ -76,7 +76,7 @@ II. REQUIREMENTS
 III. INSTALLATION
 
 	** If you are upgrading from a previous version, please
-	   read section III. **
+	   read section IV. **
 
    1.	Extrack the zip file to a temporary directory.  Copy the files
 	in the "www" directory to a location on your web server.  For
@@ -325,3 +325,14 @@ Full Population.
 from your web browser, edit your Liberum Help Desk configuration from the 
 administrative menu.  You will need to set the SQL full text searching option
 to enabled.
+
+|--------------------------------------------------------------|
+
+IX. IIS CONFIGURATION
+
+- For Windows 2008 and later, you will need to install the ASP feature
+  for the IIS role.
+- When configuring IIS, it is recommended to run Liberum under its own
+  application pool.
+- Configure ASP to allow Parent Paths. This is disabled by default, but the
+  feature is required by Liberum.

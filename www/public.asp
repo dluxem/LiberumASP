@@ -1,5 +1,4 @@
   <!--	#include file = "settings.asp" -->
-  <!-- 	#include file = "extension.asp" -->
 <SCRIPT LANGUAGE=VBScript RUNAT=SERVER>
 
 '  Liberum Help Desk, Copyright (C) 2000-2001 Doug Luxem

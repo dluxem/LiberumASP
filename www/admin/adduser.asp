@@ -111,11 +111,11 @@
         Dim newpassword
         newpassword = Left(Trim(Request.Form("newpassword")), 50)
         newpassword = Replace(newpassword, "'", "''")
-        sqlString = "INSERT INTO tblUsers (sid, uid, email1, email2, fname, firstname, lastname, phone, " & _
+        sqlString = "INSERT INTO tblUsers (sid, uid, email1, email2, fname, firstname, lastname, dateformat, phone, " & _
           "phone_home, phone_mobile, location1, department, InoutAdmin, IsRep, RepAccess, statuscode, " & _
           "statustext, statusdate, jobfunction, userresume, ListOnInoutboard, [language], [password])" & _
           " VALUES (" & intNewSid & ", '" & uid & "', '" & email & "', '" & pager & "', '" & fname & "', '" & _
-          firstname & "', '" & lastname & "', '" & phone & "', '" & phone_home & "', '" & _
+          firstname & "', '" & lastname & "', 'yyyy-mm-dd', '" & phone & "', '" & phone_home & "', '" & _
           phone_mobile & "', '" & location & "', " & department & ", " & InoutAdmin & ", " & IsRep & ", " & _
           RepAccess & ", " & statuscode & ", '" & statustext & "', " & statusdate & ", '" & _
           jobfunction & "', '" & userresume & "', " & ListOnInoutboard & ", " & usrLanguage & ", '" & _

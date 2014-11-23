@@ -297,13 +297,15 @@
           ' Add user datetime display format, default yyyy-mm-dd
           UpdateDB("ALTER TABLE tblUsers ADD [dateformat] varchar (12) NOT NULL DEFAULT 'yyyy-mm-dd'")
           
+          ' Add CDOSYS support
+          UpdateDB("INSERT INTO tblConfig_Email (id, type) VALUES (5, 'CDOSYS (Recommended)')")
+
+          
           ' Update version field
           UpdateDB("UPDATE tblConfig SET Version = '0.97'")           
           strCurVersion = "0.97"
         End If
         
-		End If
-
         ' Language Updates (keep last)
         Call UpdateAllLanguages
 
