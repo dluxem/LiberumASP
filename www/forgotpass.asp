@@ -38,6 +38,7 @@
     If Request.Form("email") = 1 Then
       Dim uid, userRes
       uid = Lcase(Trim(Request.Form("uid")))
+      uid = Replace(uid, "'", "''")
 
       Set userRes = SQLQuery(cnnDB, "SELECT email1, password FROM tblUsers WHERE uid='" & uid & "'")
 

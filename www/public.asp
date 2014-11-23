@@ -49,6 +49,7 @@ End Function
 ' Returns selected user information
 Function Usr(cnnDB, sid, strColumn)
   Dim usrRes
+  sid = Cint(sid)
   Set usrRes = SQLQuery(cnnDB, "SELECT " & strColumn & " FROM tblUsers WHERE sid=" & sid)
   If usrRes.EOF Then
     Call DisplayError(3, lang(cnnDB, "Usernotfound") & ".")

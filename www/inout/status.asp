@@ -68,6 +68,7 @@
   	Dim strSql, rstUser, rstUpdate 
   	Dim usid
   	usid = request.querystring("id")
+    usid = Replace(usid, "'", "''")
   
   	If request.form("save") = "1" then
   		Dim sStatus, Statustext, StatusDate

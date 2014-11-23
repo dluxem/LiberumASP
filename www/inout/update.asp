@@ -50,7 +50,7 @@
     ' Look for the problem id in the query string, if it's not
     ' there display an error.
     Dim mId
-    mId = request.querystring("id")
+    mId = Cint(request.querystring("id"))
 
     If (trim(mId) <> trim(sid)) and (Usr(cnnDB, sid, "inoutadmin") <> 1) or (len(mId) = 0) then
     	cnnDB.Close
