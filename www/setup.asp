@@ -277,7 +277,7 @@
         End If
 		
         ' ------------------------------
-        ' Update from 0.97 to 0.99
+        ' Update from 0.97 to 0.98
         ' ------------------------------
         If strCurVersion = "0.97" Then
         
@@ -287,6 +287,10 @@
             "[emailsent] BIT NULL , " & _
             "[lastname] varchar (50) NULL, " & _
             "[kb_inserted] int NULL")
+            
+          ' Add lang strings
+          UpdateDB("INSERT INTO tblLangStrings (id, variable, LangText) VALUES (1, 'DateFormat', 'Date Format')")
+          UpdateDB("INSERT INTO tblLangStrings (id, variable, LangText) VALUES (1, 'DueDate', 'Due Date')")
           
           ' Extend problems.title to 255 characters
           UpdateDB("ALTER TABLE problems ALTER COLUMN title varchar (255)")
@@ -299,8 +303,8 @@
 
           
           ' Update version field
-          UpdateDB("UPDATE tblConfig SET Version = '0.97'")           
-          strCurVersion = "0.97"
+          UpdateDB("UPDATE tblConfig SET Version = '0.98'")           
+          strCurVersion = "0.98"
         End If
         
         ' Language Updates (keep last)

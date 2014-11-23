@@ -374,7 +374,7 @@ Sub DisplayFooter(cnnDB, sid)
 	End If
 	Response.Write"<p><hr width=""500"">" & vbNewLine & _
 	  "<div align=""center""><font size=""-1"">" & _
-	  "<a href=""http://www.liberum.org"">" & lang(cnnDB, "LiberumHelpDesk") & "</a>, " & lang(cnnDB, "Copyright") & ". " & lang(cnnDB, "Pleaseviewthe") & " <a href=""" & Cfg(cnnDB, "BaseURL") & "/license.html"">" & lang(cnnDB, "license") & "</a>." & _
+	  "<a href=""http://www.liberum.org"">" & lang(cnnDB, "LiberumHelpDesk") & "</a>, Copyright &copy; 2014 Doug Luxem. " & lang(cnnDB, "Pleaseviewthe") & " <a href=""" & Cfg(cnnDB, "BaseURL") & "/license.html"">" & lang(cnnDB, "license") & "</a>." & _
 	  "</font></div></p>"
 	userChkRes.Close
 End Sub
@@ -473,7 +473,7 @@ Sub CheckRep(cnnDB, sid)
 	If (userchkRes.EOF) OR (sid = 0) Then
 		Dim reAddr
 
-		reAddr = "/logon.asp?URL=" & _
+		reAddr = Cfg(cnnDB, "BaseURL") & "/logon.asp?URL=" & _
 			Request.ServerVariables("PATH_INFO")
 		If Len(Request.ServerVariables("QUERY_STRING")) > 0 Then
 			reAddr = reAddr & _

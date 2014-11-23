@@ -82,7 +82,7 @@
 
       ' Get the Notes for this problem
       Dim rstNotes
-      Set rstNotes = SQLQuery(cnnDB, "SELECT * FROM tblNotes WHERE id=" & id & " AND private=0 ORDER BY addDate ASC")
+      Set rstNotes = SQLQuery(cnnDB, "SELECT id, addDate, uid, private, [note] FROM tblNotes WHERE id=" & id & " AND private=0 ORDER BY addDate ASC")
 
       ' Display The problem info, and if OPEN allow some updates
     %>

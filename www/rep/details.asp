@@ -398,7 +398,7 @@
 	description = rstProb("description")
 
   ' Get the Notes for this problem
-  Set rstNotes = SQLQuery(cnnDB, "SELECT * FROM tblNotes WHERE id=" & id & " ORDER BY addDate ASC")
+  Set rstNotes = SQLQuery(cnnDB, "SELECT id, addDate, uid, private, [note] FROM tblNotes WHERE id=" & id & " ORDER BY addDate ASC")
 
   ' Get the solution and replace characters to make
 	' it more readable.

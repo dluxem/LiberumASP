@@ -137,8 +137,7 @@ GO
 CREATE TABLE [dbo].[tblEmailMsg] (
 	[type] [varchar] (50) NOT NULL ,
 	[subject] [varchar] (50) NULL ,
-	[body] [text] NULL ,
-	[bodyhtml] [text] NULL 
+	[body] [text] NULL
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
 
