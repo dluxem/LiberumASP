@@ -18,14 +18,15 @@ SUPPORT: http://www.liberum.org/support.html
 
 CONTENTS
 
-	I.	ABOUT
-	II.	REQUIREMENTS
+	I.		ABOUT
+	II.		REQUIREMENTS
 	III.	INSTALLATION
-	IV.	UPGRADING
-	V.	DATABASES
-	VI.	EMAIL
+	IV.		UPGRADING
+	V.		DATABASES
+	VI.		EMAIL
 	VII.	AUTHENTICATION
 	VIII.   SQL FULL TEXT SEARCHING
+	IX. 	IIS CONFIGURATION
 
 |--------------------------------------------------------------|
 
@@ -336,3 +337,6 @@ IX. IIS CONFIGURATION
   application pool.
 - Configure ASP to allow Parent Paths. This is disabled by default, but the
   feature is required by Liberum.
+- For further troubleshoot information on Windows 2008 and later, please
+  see this website:
+  http://www.iis.net/learn/application-frameworks/running-classic-asp-applications-on-iis-7-and-iis-8
