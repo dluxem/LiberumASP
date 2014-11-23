@@ -637,7 +637,7 @@ End Sub
 
 ' SendMailHTML:
 ' Sends mail using the supported system set in global.asa
-Sub SendMailHTML (strToAddr, strFromAddr, strFromName, strSubject, strBody, strHTML, cnnDB)
+Sub SendMailHTML (strToAddr, strFromAddr, strFromName, strSubject, strBody, cnnDB)
 
 	Dim Mail
 
@@ -716,10 +716,8 @@ Sub SendMailHTML (strToAddr, strFromAddr, strFromName, strSubject, strBody, strH
 		Set objCDOSYSMail.Configuration = objCDOSYSCon
 			With objCDOSYSMail
 				.From = """" & strFromName & """ <" & strFromAddr & ">"
-				'.From = Cfg(cnnDB, "HDName") & " <" & Cfg(cnnDB, "HDReply") & ">"
 				.To = strToAddr
 				.Subject = strSubject
-				'.HTMLBody = strHTML 'Set the e-mail body format (HTMLBody=HTML TextBody=Plain)
 				.TextBody = strBody
 				'Send the e-mail
 				If NOT strIncomingMailServer = "" Then .Send
@@ -740,15 +738,14 @@ End Sub
 Sub eMessage (cnnDB, eType, id, strToAddr)
     ' Get the email message from the database
 	Dim emailRes
-	Set emailRes = SQLQuery(cnnDB, "Select subject, body, bodyhtml FROM tblEmailMsg WHERE type='" & eType & "'")
+	Set emailRes = SQLQuery(cnnDB, "Select subject, body FROM tblEmailMsg WHERE type='" & eType & "'")
 	If emailRes.EOF Then
 		Call DisplayError(3, lang(cnnDB, "Nomessageoftype") & " " & eType & " " & lang(cnnDB, "wasfoundinthedatabase") & ".")
 	End If
 
-	Dim subject, body, bodyHTML, strFromAddr, strFromName
+	Dim subject, body, strFromAddr, strFromName
 	subject = emailRes("subject")
 	body = emailRes("body")
-	bodyHTML = emailRes("bodyhtml")
 
 	emailRes.Close
 
@@ -809,7 +806,9 @@ Sub eMessage (cnnDB, eType, id, strToAddr)
 	
 	' Parse out the notes array for HTML formatting
 
-  On Error Resume Next
+	If Not Application("Debug") Then
+		On Error Resume Next
+	End If
 	body = Replace(body, "[problemid]", probRes("id"))
 	body = Replace(body, "[title]", probRes("title"))
 	body = Replace(body, "[description]", probRes("description"))
@@ -839,34 +838,6 @@ Sub eMessage (cnnDB, eType, id, strToAddr)
 	body = Replace(body, "[u_title]", Server.URLEncode(probRes("title")))
 	body = Replace(body, "[u_rfname]", Server.URLEncode(repRes("fname")))
 	
-	bodyHTML = Replace(bodyHTML, "[problemid]", probRes("id"))
-	bodyHTML = Replace(bodyHTML, "[title]", probRes("title"))
-	bodyHTML = Replace(bodyHTML, "[description]", probRes("description"))
-	bodyHTML = Replace(bodyHTML, "[status]", probRes("sname"))
-	bodyHTML = Replace(bodyHTML, "[priority]", probRes("pname"))
-	bodyHTML = Replace(bodyHTML, "[startdate]", DisplayDate(probRes("start_date"), lhdDateTime))
-	bodyHTML = Replace(bodyHTML, "[closedate]", DisplayDate(probRes("close_date"), lhdDateTime))
-	bodyHTML = Replace(bodyHTML, "[duedate]", DisplayDate(probRes("due_date"), lhdDateOnly))
-	bodyHTML = Replace(bodyHTML, "[category]", probRes("cname"))
-	bodyHTML = Replace(bodyHTML, "[department]", probRes("dname"))
-	bodyHTML = Replace(bodyHTML, "[phone]", probRes("uphone"))
-	bodyHTML = Replace(bodyHTML, "[location]", probRes("ulocation"))
-	bodyHTML = Replace(bodyHTML, "[solution]", probRes("solution"))
-	bodyHTML = Replace(bodyHTML, "[baseurl]", Cfg(cnnDB, "BaseURL"))
-	bodyHTML = Replace(bodyHTML, "[uid]", probRes("uid"))
-	bodyHTML = Replace(bodyHTML, "[ufname]", userRes("fname"))
-	bodyHTML = Replace(bodyHTML, "[uemail]", probRes("uemail"))
-	bodyHTML = Replace(bodyHTML, "[rid]", repRes("uid"))
-	bodyHTML = Replace(bodyHTML, "[rfname]", repRes("fname"))
-	bodyHTML = Replace(bodyHTML, "[remail]", repRes("email1"))
-	bodyHTML = Replace(bodyHTML, "[uurl]", Cfg(cnnDB, "BaseURL") & "/user/view.asp?id=" & id)
-	bodyHTML = Replace(bodyHTML, "[rurl]", Cfg(cnnDB, "BaseURL") & "/rep/view.asp?id=" & id)
-    bodyHTML = Replace(bodyHTML, "[notes]", notesHTML)
-    
-	' urlencoded
-	bodyHTML = Replace(bodyHTML, "[u_title]", Server.URLEncode(probRes("title")))
-	bodyHTML = Replace(bodyHTML, "[u_rfname]", Server.URLEncode(repRes("fname")))
-	
 	subject = Replace(subject, "[problemid]", probRes("id"))
 	subject = Replace(subject, "[title]", probRes("title"))
 	subject = Replace(subject, "[description]", probRes("description"))
@@ -874,7 +845,7 @@ Sub eMessage (cnnDB, eType, id, strToAddr)
 	subject = Replace(subject, "[priority]", probRes("pname"))
 	subject = Replace(subject, "[startdate]", DisplayDate(probRes("start_date"), lhdDateTime))
 	subject = Replace(subject, "[closedate]", DisplayDate(probRes("close_date"), lhdDateTime))
-    subject = Replace(subject, "[duedate]", DisplayDate(probRes("due_date"), lhdDateOnly))
+  subject = Replace(subject, "[duedate]", DisplayDate(probRes("due_date"), lhdDateOnly))
 	subject = Replace(subject, "[category]", probRes("cname"))
 	subject = Replace(subject, "[department]", probRes("dname"))
 	subject = Replace(subject, "[phone]", probRes("uphone"))
@@ -885,14 +856,14 @@ Sub eMessage (cnnDB, eType, id, strToAddr)
 	subject = Replace(subject, "[ufname]", userRes("fname"))
 	subject = Replace(subject, "[uemail]", probRes("uemail"))
 	subject = Replace(subject, "[rid]", repRes("uid"))
-	subject = Replace(subject, "[rfname]", repbRes("fname"))
+	subject = Replace(subject, "[rfname]", repRes("fname"))
 	subject = Replace(subject, "[remail]", repRes("email1"))
 	subject = Replace(subject, "[uurl]", Cfg(cnnDB, "BaseURL") & "/user/view.asp?id=" & id)
 	subject = Replace(subject, "[rurl]", Cfg(cnnDB, "BaseURL") & "/rep/view.asp?id=" & id)
 
   Err.Clear
   On Error GoTo 0
-	Call SendMailHTML (strToAddr, strFromAddr, strFromName, Subject, Body, BodyHTML, cnnDB)
+	Call SendMailHTML (strToAddr, strFromAddr, strFromName, Subject, Body, cnnDB)
 End Sub
 
 ' FixDay:

@@ -23,7 +23,7 @@
   -->
 
   <!-- 	#include file = "../public.asp" -->
-  <!-- 	#include file = "../extension.asp" -->
+
   <% 
     Dim cnnDB, sid
     Set cnnDB = CreateCon

@@ -1,8 +1,8 @@
 	LIBERUM HELP DESK
 	-----------------
 
-Version: 0.97.3 (build 003)
-Date: 08/28/2002
+Version: 0.98
+Date: TBD
 
 Please view CHANGELOG.TXT for changes in this version.
 

@@ -61,7 +61,7 @@
 
       id = Trim(id)
 
-      If IsNumeric(id) Then
+      If id <> 0 Then
         listStr = listStr & "WHERE p.uid='" & uid & "' AND p.id=" & id
       Else
         listStr = listStr & "WHERE p.uid='" & uid & "'"

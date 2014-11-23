@@ -291,9 +291,6 @@
           ' Extend problems.title to 255 characters
           UpdateDB("ALTER TABLE problems ALTER COLUMN title varchar (255)")
           
-          ' Add html email support
-          UpdateDB("ALTER TABLE tblEmailMsg ADD [bodyhtml] text NULL")
-          
           ' Add user datetime display format, default yyyy-mm-dd
           UpdateDB("ALTER TABLE tblUsers ADD [dateformat] varchar (12) NOT NULL DEFAULT 'yyyy-mm-dd'")
           

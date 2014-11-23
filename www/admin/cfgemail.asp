@@ -52,15 +52,13 @@
       ' Save Results
       If Request.Form("save") = "1" Then
         Dim strSQL, updRes
-        Dim Subject, Body, BodyHTML
+        Dim Subject, Body
 
         Subject = Left(Trim(Request.Form("subject")), 50)
         Body = Trim(Request.Form("body"))
-		BodyHTML = Trim(Request.Form("bodyhtml"))
 
         strSQL = "UPDATE tblEmailMsg SET " & _
           "subject = '" & Subject & "', " & _
-          "bodyhtml = '" & BodyHTML & "', " & _
           "body = '" & Body & "' " & _
           "WHERE type='" & eType & "'"
 
@@ -71,7 +69,7 @@
       If Not displayMenu Then
         Dim cfgRes
         ' Get current configuration
-        Set cfgRes = SQLQuery(cnnDB, "Select Subject, Body, bodyhtml From tblEmailMsg WHERE type='" & eType & "'")
+        Set cfgRes = SQLQuery(cnnDB, "Select Subject, Body From tblEmailMsg WHERE type='" & eType & "'")
 
         If cfgRes.EOF Then
           Call DisplayError(3, lang(cnnDB, "Unable to read message from the database") & ".")
@@ -144,9 +142,6 @@
                 <div align="center">
 					<b>Plain Text</b><br>
                   <textarea rows="8" cols="80" name="body"><% = cfgRes("body") %></textarea>
-                  <p>
-				  <b>HTML</b><br>
-				  <textarea rows="8" cols="80" name="bodyhtml"><% = cfgRes("bodyhtml") %></textarea>
                   <p>
                   <a href="cfgemail_help.asp" target="#"><%=lang(cnnDB, "SyntaxHelp")%></a>
                   <p>
